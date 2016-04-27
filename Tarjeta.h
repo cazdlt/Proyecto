@@ -14,9 +14,11 @@ protected:
 public:
     static int vCambio;
 	static void updateVCambio();
-	 
+	friend  std::ostream& operator<<(std::ostream &o, const Tarjeta& t);
+	
 	//CONSTRUCTORES
     Tarjeta();
+	Tarjeta(std::string t , std::string f , bool c);
 	
 	//ACCESO
     char getTipo();

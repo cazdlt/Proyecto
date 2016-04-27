@@ -2,10 +2,21 @@
 
 int Tarjeta::vCambio=4;
 
+ std::ostream& operator<<(std::ostream &o, const Tarjeta& t){ 
+         o<<t.figura<<" "<<t.territorio;
+         return o;            
+}
+
 Tarjeta::Tarjeta(){
     territorio="";
     figura="";
     canjeada=false;
+}
+
+Tarjeta::Tarjeta(std::string t , std::string f , bool c){
+    territorio=t;
+    figura=f;
+    canjeada=c;
 }
 
 char Tarjeta::getTipo(){

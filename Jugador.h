@@ -38,6 +38,8 @@ class Jugador{
 		int getID();
 		std::vector<Territorio*> getTerritorios();
         void setTerritorios(std::vector<Territorio*> n);
+		std::vector<Tarjeta> getTarjetas();
+		void setTarjetas(std::vector<Tarjeta> n);
 		
 		//FUNCIONES
         void restarInfanterias();       

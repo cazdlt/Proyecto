@@ -84,28 +84,32 @@ Territorio* Jugador::searchTerritorio(unsigned int inputID) {
 }
 
 int Jugador::cambiarCartas() {
+	//todo cambiar por comodines
 	int cnt=0;
 	std::vector<Tarjeta>::iterator it;
-	std::stack<Tarjeta> art;
-	std::stack<Tarjeta> inf;
-	std::stack<Tarjeta> cab;
-	std::stack<Tarjeta> com;
+	std::stack<Tarjeta*> art;
+	std::stack<Tarjeta*> inf;
+	std::stack<Tarjeta*> cab;
+	std::stack<Tarjeta*> com;
 
 	for(it=tarjetas.begin(); it!=tarjetas.end(); it++) {
-		if(it->getFigura()=="Artilleria")
-			art.push(*it);
-		else if(it->getFigura()=="Caballeria")
-			cab.push(*it);
-		else if(it->getFigura()=="Infanteria")
-			inf.push(*it);
-		else if(it->getFigura()=="Comodin")
-			com.push(*it);
+		if(!it->isCanjeada()){
+			if(it->getFigura()=="Artilleria")
+				art.push(&(*it));
+			else if(it->getFigura()=="Caballeria")
+				cab.push(&(*it));
+			else if(it->getFigura()=="Infanteria")
+				inf.push(&(*it));
+			else if(it->getFigura()=="Comodin")
+				com.push(&(*it));
+		}
 	}
 
 	while(art.size()>=3) {
 		for(int i=0; i<3; i++) {
-			Tarjeta tar=art.top();
-			std::string terr=tar.getTerritorio();
+			Tarjeta* tar=art.top();
+			std::string terr=tar->getTerritorio();
+			tar->setCanjeada(true);
 			art.pop();
 			Territorio* t0=searchTerritorio(terr);
 
@@ -121,8 +125,9 @@ int Jugador::cambiarCartas() {
 
 	while(cab.size()>=3) {
 		for(int i=0; i<3; i++) {
-			Tarjeta tar=cab.top();
-			std::string terr=tar.getTerritorio();
+			Tarjeta* tar=cab.top();
+			std::string terr=tar->getTerritorio();
+			tar->setCanjeada(true);
 			cab.pop();
 			Territorio* t0=searchTerritorio(terr);
 
@@ -138,8 +143,9 @@ int Jugador::cambiarCartas() {
 
 	while(inf.size()>=3) {
 		for(int i=0; i<3; i++) {
-			Tarjeta tar=inf.top();
-			std::string terr=tar.getTerritorio();
+			Tarjeta* tar=inf.top();
+			std::string terr=tar->getTerritorio();
+			tar->setCanjeada(true);
 			inf.pop();
 			Territorio* t0=searchTerritorio(terr);
 
@@ -284,6 +290,14 @@ void Jugador::setTerritorios(std::vector<Territorio*> n) {
 
 bool Jugador::isActive() {
 	return !territorios.empty();
+}
+
+std::vector<Tarjeta> Jugador::getTarjetas(){
+	return tarjetas;
+}
+
+void Jugador::setTarjetas(std::vector<Tarjeta> n){
+	tarjetas=n;
 }
 
 int escojerNumDados(int max,bool flag){
@@ -553,7 +567,7 @@ bool Jugador::atacar(Tablero* tablero) {
 		Tarjeta tar = aux->top();
 		aux->pop();
 		this->tarjetas.push_back(tar);
-		std::cout<<"\nHaz obtenido la carta "<<tar.getFigura()<<" "<<tar.getTerritorio()<<std::endl;
+		std::cout<<"\nHaz obtenido la carta "<<tar<<std::endl;
 		return true;
 	}
 

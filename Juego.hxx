@@ -82,6 +82,8 @@ std::stack<Tarjeta> fillTarjetas(Tablero* t0) {
 	return auxT;
 }
 
+
+
 int updateTurno(Juego* j0) {
 	unsigned int i=j0->turno+1;
 	std::vector<Jugador> j=j0->getJugadores();
@@ -127,19 +129,21 @@ std::string pickColor(std::vector<std::string>& disp) {
 }
 
 bool Juego::inicializar() {
-
+	
+	Territorio::CURR_ID=1;
 	std::vector<std::string> cor= {"Azul","Verde","Amarillo","Rojo","Blanco","Negro"};
 	int cantidadJugadores=0,cantidadFiguras=0;
 	std::vector<Jugador> auxj;
 	std::vector<int> dados;
 	std::string nombreJ,color;
+	srand(time(0));
 	
 	std::cout<<"Digite la cantidad de jugadores: ";
 	std::cin>>cantidadJugadores;
 	std::cin.ignore();
 
 	if(cantidadJugadores==3) {
-		cantidadFiguras=5;
+		cantidadFiguras=35;
 	}
 	else if(cantidadJugadores==4) {
 		cantidadFiguras=30;
@@ -163,36 +167,35 @@ bool Juego::inicializar() {
 	tablero->setTarjetas(fillTarjetas(tablero));
 
 	for(int i=0; i<cantidadJugadores; i++) {
-		std::cout<<"Elige un nombre: ";
+		std::cout<<"\nElige un nombre: ";
 		getline(std::cin,nombreJ);
 		color=pickColor(cor);
-		Jugador* aux= new Jugador(nombreJ, color, cantidadFiguras, i+1);
-		auxj.push_back(*aux);
+		Jugador auxj(nombreJ, color, cantidadFiguras, i+1);
+		jugadores.push_back(auxj);
 	}
+	
 	std::cout<<std::endl;
 	
 	for(int i=0; i<cantidadJugadores; i++){
 		int z=rand()%6+1;
-		std::cout<<"Lanzamiento de "<<auxj[i].getColor()<<": "<<z<<std::endl;
+		std::cout<<"Lanzamiento de "<<jugadores[i].getColor()<<": "<<z<<std::endl;
 		dados.push_back(z);
 	}
+	std::cout<<"Digite una tecla para continuar."<<std::endl;
+	std::cin.get();
 	
-	Jugador tempj;
-	int temp;
-	for(int i=0; i<cantidadJugadores; i++){
-		for(int j=0;j<cantidadJugadores-1;j++){
-			if(dados[j+1]>dados[j]){
-				temp=dados[j];
-				dados[j]=dados[j+1];
-				dados[j+1]=temp;
-				tempj=jugadores[j];
-				jugadores[j]=jugadores[j+1];
-				jugadores[j+1]=tempj;
+	bool cambiado=false;
+	for(int i=0; i<cantidadJugadores-1; i++){
+		for(int j=0;j<cantidadJugadores-1-i;j++){
+			if(dados[j]<dados[j+1]){
+				std::swap(dados[j],dados[j+1]);		
+				std::swap(jugadores[j],jugadores[j+1]);
+				cambiado=true;
 			}
+			if(!cambiado) break;
 		}
 	}
-	
-	
+
 	int id,cnt=0,tot=0;
 	std::vector<Continente*> continentes=tablero->getContinentes();
 	std::vector<Jugador>::iterator itj;
@@ -409,4 +412,126 @@ void Juego::print(){
 		std::cout<<"Juego no iniciado.\n"<<std::endl;
 }
 
+std::vector<std::string> splitstring(const std::string &s, char token) {
+    std::vector<std::string> ret;
+	std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, token)) {
+		if(!item.empty())
+			ret.push_back(item);
+    }
+    return ret;
+}
+
+bool Juego::save(std::string input){
+	std::vector<std::string> in=splitstring(input,' ');
+	
+	if(in.size()>1){
+		if(in[0]=="comprimido")
+			std::swap(in[0],in[1]);
+		else{
+			std::cout<<"Comando invalido. Digite help para visualizar las opciones disponibles."<<std::endl;
+			return false;
+		}			
+	}
+	
+	std::ofstream arch(in[0]);
+	if(arch.is_open()){
+		guardarPartida(arch,jugadores);
+		arch.close();
+	}
+	else{
+		std::cout<<"Error de archivo."<<std::endl;
+		return false;
+	}
+	
+	if(in.size()>1)
+		comprimir(in[0]);
+	
+	
+	return true;
+}
+
+/**
+ *	FORMATO:
+ * 	cantidadJugadores-turno-valorCambioTarjetas
+ * 	/color-nombre
+ * 	*carta1*carta2*cartaN /////carta=="figura territorio-canjeada"
+ * 	+territorio1+territorioN /////territorio=="id-ejercito"
+ * 	/color-nombre
+ * 	...........
+ * 	
+ * */
+bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){ 
+	unsigned int sz=jugadores.size();
+	std::vector<Tarjeta> tjs;
+	std::vector<Territorio*> tts;
+	
+	file<<sz<<"*"<<Juego::turno<<"*"<<Tarjeta::vCambio<<std::endl;
+	for(unsigned int i=0;i<sz;i++){
+		file<<jugadores[i].getColor()<<"*"<<jugadores[i].getNombre()<<std::endl;
+		tjs=jugadores[i].getTarjetas();
+		tts=jugadores[i].getTerritorios();
+		
+		for(unsigned int j=0;j<tjs.size();j++)
+			file<<"*"<<tjs[j]<<"-"<<tjs[i].isCanjeada();
+		file<<std::endl;
+		for(unsigned int j=0;j<tts.size();j++)
+			file<<"*"<<tts[j]->getID()<<"-"<<tts[j]->getEjercito();
+		file<<std::endl;
+	}
+	return true;
+}
+
+bool Juego::inicializar(std::string input) {
+	
+	Territorio::CURR_ID=1;
+	std::ifstream arch(input);
+	std::string line;
+	std::vector<std::string> in,sp;
+	int i=1,cnt=1;
+	tablero=new Tablero();
+	std::vector<Tarjeta> vt;
+	
+	if(arch.is_open()){
+		
+		while(getline(arch,line)){
+			in=splitstring(line,'*');
+			if(i==0){ //primera linea
+				turno=atoi(in[1].c_str());
+				Tarjeta::vCambio=atoi(in[2].c_str());
+			}
+			if(i==1){ //datos jugador
+				Jugador auxj(in[1],in[0],0,cnt);
+				jugadores.push_back(auxj);
+			}
+			else if(i==2){ //cartas jugador
+				std::vector<Tarjeta> jt;
+				for(unsigned int j=0;j<in.size();j++){ //para cada carta agregar a vector
+					sp=splitstring(in[j],'-');
+					std::vector<std::string> tar=splitstring(sp[0],' ');
+					bool canjeada=(sp[1]=="0"?false:true);
+					Tarjeta auxt(tar[1],tar[0],canjeada);
+					jt.push_back(auxt);
+				}
+				jugadores[cnt-1].setTarjetas(vt);
+			}
+			else if(i==3){ //territorios jugador
+				i=1;
+			}
+			i++;
+		}
+		arch.close();
+	}
+	else{
+		std::cout<<"Error de archivo.";
+		return false;
+	}
+	return true;
+}
+
+bool comprimir(std::string in){
+	//TODO
+	return true;
+}
 //EOF

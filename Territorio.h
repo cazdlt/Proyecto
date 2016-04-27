@@ -9,7 +9,6 @@ class Jugador;
 
 class Territorio{
 protected:
-		static unsigned int CURR_ID;
 		int id;
         std::string nombre;
 		std::string color;
@@ -18,7 +17,9 @@ protected:
         std::vector<Figura> unidades;
         std::vector<Territorio*> territoriosAdyacentes;
         bool ocupado;
-	public:
+public:
+		static unsigned int CURR_ID;
+		
 		//CONSTRUCTORES
 		Territorio();
         Territorio(std::string nombre);
