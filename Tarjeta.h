@@ -15,6 +15,7 @@ public:
     static int vCambio;
 	static void updateVCambio();
 	friend  std::ostream& operator<<(std::ostream &o, const Tarjeta& t);
+	friend bool operator==(const Tarjeta& t1,const Tarjeta& t2); 
 	
 	//CONSTRUCTORES
     Tarjeta();

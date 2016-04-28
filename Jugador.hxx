@@ -265,8 +265,9 @@ void Jugador::restarInfanterias() {
 	this->cantidadInfanteria--;
 }
 
-
-
+void Jugador::setID(int n){
+	id=n;
+}
 
 int Jugador::printTerritorios() {
 	int i=0;
@@ -301,6 +302,8 @@ void Jugador::setTarjetas(std::vector<Tarjeta> n){
 }
 
 int escojerNumDados(int max,bool flag){
+	if(max==1)
+		return 1;
 	int ndados;
 	std::cout<<"\nDigite el numero de tropas a ser utilizadas en "<<(flag? "el ataque" : "la defensa ")<<" (max="<<max<<"): ";
 	std::cin>>ndados;;
@@ -591,3 +594,5 @@ void Jugador::addTerritorio(Territorio* t0) {
 	t0->setColor(color);
 	std::sort(territorios.begin(),territorios.end());
 }
+
+//EOF

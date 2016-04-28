@@ -35,6 +35,7 @@ class Jugador{
         int getInfanteria();
         void setEjercito(Figura* figura);
         std::vector<Figura> getEjercito();
+		void setID(int id);
 		int getID();
 		std::vector<Territorio*> getTerritorios();
         void setTerritorios(std::vector<Territorio*> n);
@@ -56,6 +57,11 @@ class Jugador{
         void eliminarTerritorio(std::string nombret);
         void addTerritorio(Territorio* t0);
 };
+
+//UTILS
+void lanzarDados(int& eo,int& ed);
+int escojerNumDados(int max,bool flag);
+bool realizarAtaque(Territorio* to,Territorio* td);
 
 #include "Jugador.hxx"
 #endif

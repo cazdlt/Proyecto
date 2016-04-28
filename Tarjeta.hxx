@@ -7,6 +7,10 @@ int Tarjeta::vCambio=4;
          return o;            
 }
 
+bool operator==(const Tarjeta& t1,const Tarjeta& t2){
+	return (t1.territorio==t2.territorio)&&(t1.figura==t2.figura);
+}
+
 Tarjeta::Tarjeta(){
     territorio="";
     figura="";
@@ -59,3 +63,5 @@ void Tarjeta::updateVCambio(){
     else
         vCambio+=5;
 }
+
+//EOF

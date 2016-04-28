@@ -26,13 +26,4 @@ void Figura::setColor(std::string color)
     this->color = color;
 }
 
-/*
-void Figura::setUbicacion(Territorio* ter)
-{
-    this->ubicacion=ter;
-}
-Territorio* Figura::getUbicacion()
-{
-    return this->ubicacion;
-}
-*/
+//EOF
