@@ -5,6 +5,7 @@
 #include <vector>
 #include "Continente.h"
 #include "Tarjeta.h"
+#include <algorithm>
 
 class Tablero{
     protected:
@@ -26,7 +27,11 @@ class Tablero{
 		Territorio* searchTerritorio(unsigned int id);
 		Territorio* searchTerritorioDisponible(unsigned int id);
         Territorio* pickAdyacente(bool enemigo,Jugador* j0,Territorio* terr);
+		void fillTarjetas();
 };
+
+//UTILS
+std::vector<Tarjeta> allTarjetas(Tablero* t0);
 
 #include "Tablero.hxx"
 #endif

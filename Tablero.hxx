@@ -408,3 +408,76 @@ Territorio* Tablero::pickAdyacente(bool enemigo,Jugador* j0,Territorio* terr) {
 
 	return ret;
 }
+
+std::vector<Tarjeta> allTarjetas(Tablero* t0){
+	//vars
+	std::vector<Tarjeta> ret;
+	Tarjeta aux;
+	std::vector<Continente*> ctes=t0->getContinentes();
+	std::vector<Territorio*> ttos;
+	std::vector<Continente*>::iterator itC;
+	std::vector<Territorio*>::iterator itT;
+	
+	int i=0;
+
+	//llenando vector de cartas a mezclar
+	for(itC=ctes.begin(); itC!=ctes.end(); itC++) {
+		ttos=(*itC)->getTerritorios();
+
+		for(itT=ttos.begin(); itT!=ttos.end(); itT++) {
+			std::string tto=(*itT)->getNombre();
+			aux.setTerritorio(tto);
+			aux.setTipo('n');
+			std::string f;
+
+			if(i<15)
+				f="Artilleria";
+			else if(i<30)
+				f="Caballeria";
+			else
+				f="Infanteria";
+
+			aux.setFigura(f);
+
+			ret.push_back(aux);
+			i++;
+		}
+	}
+
+	//comodines
+	aux.setTerritorio("");
+	aux.setTipo('c');
+	aux.setFigura("Comodin");
+	ret.push_back(aux);
+	ret.push_back(aux);
+
+	//cartas de mision????????
+	/*
+	for(int i=0; i<12; i++)
+	{
+	    aux.setTerritorio("");
+	    aux.setTipo('m');
+	    aux.setFigura("Mision");
+	    ret.push_back(aux);
+	}
+	*/
+	return ret;
+}
+
+void Tablero::fillTarjetas() {
+	
+	std::vector<Tarjeta> ret=allTarjetas(this);
+	
+	//mezclando
+	random_shuffle(ret.begin(),ret.end());
+
+	//agregando a stack
+	std::stack<Tarjeta> auxT;
+
+	for(std::vector<Tarjeta>::iterator it0=ret.begin(); it0!=ret.end(); it0++)
+		auxT.push(*it0);
+
+	tarjetas=auxT;
+}
+
+//EOF

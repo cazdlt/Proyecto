@@ -10,7 +10,8 @@
 #include <stack>
 #include <iostream>
 #include <string>
-#include <algorithm>
+#include <sstream>
+#include <fstream>
 
 class Juego{
 	protected:
@@ -32,6 +33,7 @@ class Juego{
 		
 		//FUNCIONES		
         bool inicializar();
+		bool inicializar(std::string);
         int jugarTurno(int player); //0. turno completado -- 1.no es el turno -- 2. no existe player        
         Jugador* searchJugador(int id);
         Jugador* searchJugador(std::string nombre);
@@ -40,7 +42,19 @@ class Juego{
         void help(std::string input);        
         void ver(std::string input);
 		void print();
-
+		bool save(std::string input);
+		void textinit(std::ifstream& file);	
+		bool llenarJugadores(int cant);
+		
 };
+
+//UTILS
+std::vector<std::string> splitstring(const std::string &s, char token);
+std::string pickColor(std::vector<std::string>& disp);
+int updateTurno(Juego* j0);
+bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores);
+bool comprimir(std::string input);
+std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjeta>& t2);
+
 #include "Juego.hxx"
 #endif

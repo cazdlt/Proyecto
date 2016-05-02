@@ -14,7 +14,7 @@ int main() {
 		std::cout<<"$ ";
 		getline(std::cin,entrada);
 
-		if(entrada=="inicializar") {
+		if(entrada.find("inicializar")==0) {
 			if(!juego.getEstado())
 				std::cout<<"El juego ya esta en curso."<<std::endl;
 			else if(juego.getEstado()==2){
@@ -22,8 +22,14 @@ int main() {
 				if(juego.inicializar())
                     std::cout<<"Juego inicializado."<<std::endl;
 			}
-			else if(juego.inicializar())
-				std::cout<<"Juego inicializado."<<std::endl;
+			else{
+				if(entrada.size()>12){
+					if(juego.inicializar(entrada.substr(12)))
+						std::cout<<"Juego inicializado.";
+				}
+				else if(juego.inicializar())
+					std::cout<<"Juego inicializado.";
+			}
             std::cout<<std::endl;
 		}
 
@@ -60,6 +66,9 @@ int main() {
                 juego.ver(entrada.substr(4));
 			else 
 				juego.print();
+		}
+		else if(entrada.find("guardar")==0&&entrada.size()>8){
+			juego.save(entrada.substr(8));
 		}
 		else if(entrada!="salir"&&entrada!="")
             std::cout<<"Comando no encontrado. Digite help para visualizar las opciones disponibles."<<std::endl;
