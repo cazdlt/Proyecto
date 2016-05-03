@@ -409,23 +409,29 @@ bool Juego::save(std::string input){
  * 	
  * */
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){ 
-	unsigned int sz=jugadores.size();
+	size_t sz=jugadores.size();
 	std::vector<Tarjeta> tjs;
 	std::vector<Territorio*> tts;
 	
-	file<<"txt"<<std::endl;
-	file<<sz<<"*"<<Juego::turno<<"*"<<Tarjeta::vCambio<<std::endl;
+	file<<sz<<std::endl;
 	for(unsigned int i=0;i<sz;i++){
-		file<<jugadores[i].getColor()<<"*"<<jugadores[i].getNombre()<<std::endl;
-		tjs=jugadores[i].getTarjetas();
-		tts=jugadores[i].getTerritorios();
 		
-		for(unsigned int j=0;j<tjs.size();j++)
-			file<<"*"<<tjs[j]<<"-"<<tjs[j].isCanjeada();
-		file<<std::endl;
+		//info
+		file<<jugadores[i].getNombre()<<std::endl;
+		file<<jugadores[i].getColor()<<std::endl;
+		
+		//territorios
+		tts=jugadores[i].getTerritorios();
+		file<<tts.size()<<std::endl;
 		for(unsigned int j=0;j<tts.size();j++)
-			file<<"*"<<tts[j]->getID()<<"-"<<tts[j]->getEjercito();
-		file<<std::endl;
+			file<<tts[j]->getID()<<" "<<tts[j]->getEjercito()<<std::endl;
+			
+		//tarjetas
+		tjs=jugadores[i].getTarjetas();
+		file<<tjs.size();
+		for(unsigned int j=0;j<tjs.size();j++)
+			file<<tjs[j]<<" "<<tjs[j].isCanjeada()<<std::endl;
+		
 	}
 	return true;
 }
