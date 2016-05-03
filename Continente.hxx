@@ -1,5 +1,6 @@
 #include "Continente.h"
 
+
 Continente::Continente(std::string nombre)
 {
     this->nombre=nombre;
@@ -28,6 +29,7 @@ std::string Continente::getNombre()
 {
     return this->nombre;
 }
+
 
 std::vector<Territorio*> Continente::getTerritorios()
 {

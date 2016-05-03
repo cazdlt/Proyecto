@@ -5,10 +5,11 @@
 #include "Territorio.h"
 
 class Continente{
-    protected:
+protected:
         std::string nombre;
         std::vector<Territorio*> territorios;
-	public:
+public:
+	
 		//CONSTRUCTORES
         Continente(std::string nombre);
 		~Continente();
@@ -16,6 +17,7 @@ class Continente{
         void setNombre(std::string nombre);
         std::string getNombre();
         std::vector<Territorio*> getTerritorios();
+		unsigned int getID();
 		
 		//FUNCIONES
         void AgregarTerritorio(Territorio* ter);

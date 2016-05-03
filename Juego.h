@@ -43,7 +43,7 @@ class Juego{
         void ver(std::string input);
 		void print();
 		bool save(std::string input);
-		void textinit(std::ifstream& file);	
+		void textinit(std::ifstream& file,unsigned int sz);	
 		bool llenarJugadores(int cant);
 		
 };

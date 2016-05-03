@@ -25,6 +25,7 @@ class Jugador{
 	public:	
 		//CONSTRUCTORES
         Jugador(std::string nombre, std::string color, int cantidadInfanteria, int id);
+		Jugador();
 		
 		//ACCESO
         void setNombre(std::string nombre);

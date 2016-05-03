@@ -10,14 +10,6 @@ Tablero::Tablero() {
 	Continente* Asia= new Continente("Asia");
 	Continente* Australia= new Continente("Australia");
 
-	//AFRICA
-	Territorio* Congo= new Territorio("Congo");
-	Territorio* AfricaOriental= new Territorio("Africa Oriental");
-	Territorio* Egipto= new Territorio("Egipto");
-	Territorio* Madagascar= new Territorio("Madagascar");
-	Territorio* AfricaDelNorte= new Territorio("Africa del Norte");
-	Territorio* AfricaDelSur= new Territorio("Africa del Sur");
-
 	//NA
 	Territorio* Alaska= new Territorio("Alaska");
 	Territorio* Alberta= new Territorio("Alberta");
@@ -28,13 +20,7 @@ Tablero::Tablero() {
 	Territorio* Ontario= new Territorio("Ontario");
 	Territorio* Quebec= new Territorio("Quebec");
 	Territorio* EstadosUnidosOccidentales= new Territorio("Estados Unidos Occidentales");
-
-	//AUS
-	Territorio* AustraliaOriental= new Territorio("Australia Oriental");
-	Territorio* Indonesia= new Territorio("Indonesia");
-	Territorio* NuevaGuinea= new Territorio("Nueva Guinea");
-	Territorio* AustraliaOccidental= new Territorio("Australia Occidental");
-
+	
 	//EU
 	Territorio* GranBretana= new Territorio("Gran Bretana");
 	Territorio* Islandia= new Territorio("Islandia");
@@ -43,7 +29,7 @@ Tablero::Tablero() {
 	Territorio* EuropaDelSur= new Territorio("Europa del Sur");
 	Territorio* Ucrania= new Territorio("Ucrania");
 	Territorio* EuropaOccidental= new Territorio("Europa Occidental");
-
+	
 	//ASIA
 	Territorio* Afghanistan= new Territorio("Afghanistan");
 	Territorio* China= new Territorio("China");
@@ -57,12 +43,26 @@ Tablero::Tablero() {
 	Territorio* Siberia= new Territorio("Siberia");
 	Territorio* Ural= new Territorio("Ural");
 	Territorio* Yakutsk= new Territorio("Yakutsk");
-
+	
 	//SA
 	Territorio* Argentina= new Territorio("Argentina");
 	Territorio* Brasil= new Territorio("Brasil");
 	Territorio* Peru= new Territorio("Peru");
 	Territorio* Venezuela= new Territorio("Venezuela");
+	
+	//AFRICA
+	Territorio* Congo= new Territorio("Congo");
+	Territorio* AfricaOriental= new Territorio("Africa Oriental");
+	Territorio* Egipto= new Territorio("Egipto");
+	Territorio* Madagascar= new Territorio("Madagascar");
+	Territorio* AfricaDelNorte= new Territorio("Africa del Norte");
+	Territorio* AfricaDelSur= new Territorio("Africa del Sur");
+
+	//AUS
+	Territorio* AustraliaOriental= new Territorio("Australia Oriental");
+	Territorio* Indonesia= new Territorio("Indonesia");
+	Territorio* NuevaGuinea= new Territorio("Nueva Guinea");
+	Territorio* AustraliaOccidental= new Territorio("Australia Occidental");
 
 
 //ADYACENTES
@@ -287,12 +287,13 @@ Tablero::Tablero() {
 	Asia->AgregarTerritorio(Yakutsk);
 
 	//AGREGANDO A TABLERO
-	this->continentes.push_back(Africa);
 	this->continentes.push_back(AmericaN);
-	this->continentes.push_back(Australia);
 	this->continentes.push_back(Europe);
 	this->continentes.push_back(Asia);
 	this->continentes.push_back(AmericaS);
+	this->continentes.push_back(Africa);
+	this->continentes.push_back(Australia);
+		
 }
 
 Tablero::~Tablero(){
@@ -315,13 +316,18 @@ void Tablero::print() {
 
 void Tablero::printDisponibles() {
 	std::vector<Continente*>::iterator it;
+	bool flag;
 	for(it=continentes.begin(); it!=continentes.end(); it++) {
 		std::cout<<(*it)->getNombre()<<":"<<std::endl;
 		std::vector<Territorio*> te=(*it)->getTerritorios();
 		std::vector<Territorio*>::iterator it2;
 		for(it2=te.begin(); it2!=te.end(); it2++)
-			if(!(*it2)->isOcupado())
+			if(!(*it2)->isOcupado()){
 				std::cout<<'\t'<<(*it2)->getID()<<".  "<<(*it2)->getNombre()<<":"<<std::endl;
+				flag=true;
+			}
+		if(!flag)
+			std::cout<<"No hay territorios disponibles en "<<(*it)->getNombre()<<std::endl;
 	}
 }
 
@@ -445,7 +451,7 @@ std::vector<Tarjeta> allTarjetas(Tablero* t0){
 	}
 
 	//comodines
-	aux.setTerritorio("");
+	aux.setTerritorio(" ");
 	aux.setTipo('c');
 	aux.setFigura("Comodin");
 	ret.push_back(aux);

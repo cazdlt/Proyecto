@@ -1,5 +1,13 @@
 #include "Jugador.h"
 
+Jugador::Jugador(){
+	//pass
+	cantidadInfanteria=0;
+	id=0;
+	color=" ";
+	nombre=" ";
+}
+
 Jugador::Jugador(std::string nombre, std::string color, int cantidadInfanteria, int nid) {
 	this->nombre=nombre;
 	this->color=color;

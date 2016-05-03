@@ -30,6 +30,7 @@ public:
     void setTerritorio(std::string n);
     void setFigura(std::string n);
 	void setTipo(char n);
+	std::string getID();
 };
 
 #include "Tarjeta.hxx"

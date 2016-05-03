@@ -35,6 +35,11 @@ std::string Tarjeta::getFigura(){
     return figura;
 }
 
+std::string Tarjeta::getID(){
+	char c=(canjeada?'1':'0');
+	return territorio+" "+figura[0]+" "+c;
+}
+
 bool Tarjeta::isCanjeada(){
     return canjeada;
 }

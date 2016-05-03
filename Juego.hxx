@@ -133,7 +133,7 @@ bool Juego::inicializar() {
 	Territorio::CURR_ID=1;
 	int cantidadJugadores=0;
 	int id,cnt=0,tot=0;
-	std::vector<Continente*> continentes=tablero->getContinentes();
+	std::vector<Continente*> continentes;
 	std::vector<Jugador>::iterator itj;
 	Territorio* t0=NULL;
 	
@@ -146,7 +146,7 @@ bool Juego::inicializar() {
 	
 	tablero=new Tablero();
 	tablero->fillTarjetas();
-	
+	continentes=tablero->getContinentes();
 	for(unsigned int i=0;i<continentes.size();i++)
 		tot+=continentes[i]->getTerritorios().size();
 	
@@ -397,17 +397,6 @@ bool Juego::save(std::string input){
 	return true;
 }
 
-/**
- *	FORMATO:
- * 	"txt"
- * 	cantidadJugadores*turno*valorCambioTarjetas
- * 	color*nombre
- * 	*carta1*carta2*cartaN /////carta=="figura territorio-canjeada"
- * 	*territorio1*territorioN /////territorio=="id-ejercito"
- * 	color*nombre
- * 	...........
- * 	
- * */
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){ 
 	size_t sz=jugadores.size();
 	std::vector<Tarjeta> tjs;
@@ -428,9 +417,9 @@ bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){
 			
 		//tarjetas
 		tjs=jugadores[i].getTarjetas();
-		file<<tjs.size();
+		file<<tjs.size()<<std::endl;
 		for(unsigned int j=0;j<tjs.size();j++)
-			file<<tjs[j]<<" "<<tjs[j].isCanjeada()<<std::endl;
+			file<<tjs[j].getID()<<std::endl;
 		
 	}
 	return true;
@@ -445,6 +434,7 @@ std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjet
 	
 	std::vector<std::vector<Tarjeta>::iterator> vit;
 	for(std::vector<Tarjeta>::iterator it=t1.begin() ; it!=t1.end() ; it++){
+		Tarjeta::updateVCambio();
 		if(find(t2.begin(),t2.end(),*it) != t2.end())
 			vit.push_back(it);
 	}
@@ -471,8 +461,8 @@ bool Juego::inicializar(std::string input) {
 	
 	if(arch.is_open()){
 		getline(arch,line);
-		if(line=="txt")
-			textinit(arch);
+		if(line.size()==1)
+			textinit(arch,atoi(line.c_str()));
 		//else usar el comprimido
 		arch.close();
 		return true;
@@ -483,48 +473,57 @@ bool Juego::inicializar(std::string input) {
 	}
 }
 
-void Juego::textinit(std::ifstream& arch){
+void Juego::textinit(std::ifstream& arch,unsigned int sz){
 	
-	std::string line;
+	unsigned int tts=0,tjs=0;
+	std::string line,f;
 	std::vector<std::string> in,sp;
-	int i=0,cnt=0;
-	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero);
+	Territorio* t0=NULL;
+	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero),jt;
+	jugadores.resize(sz);
+	bool c;
 	
-	while(getline(arch,line)){
+	for(unsigned int i=0;i<sz;i++)	{
+		
+			//datos
+			Jugador auxj;
+			jugadores[i].setID(i+1);
+			getline(arch,line);
+			jugadores[i].setNombre(line);
+			getline(arch,line);
+			jugadores[i].setColor(line);
 			
-			in=splitstring(line,'*');
+			//territorios
+			getline(arch,line);
+			tts=atoi(line.c_str());
+			for(unsigned int j=0;j<tts;j++){
+				getline(arch,line);
+				in=splitstring(line,' ');
+				t0=tablero->searchTerritorio(atoi(in[0].c_str()));
+				t0->setEjercito(atoi(in[1].c_str()));
+				jugadores[i].addTerritorio(t0);
+			}
 			
-			if(i==0){ //datos juego
-				turno=atoi(in[1].c_str());
-				Tarjeta::vCambio=atoi(in[2].c_str());
+			//tarjetas
+			getline(arch,line);
+			tjs=atoi(line.c_str());
+			jt.resize(tjs);
+			for(unsigned int j=0;j<tjs;j++){
+				in=splitstring(line,' ');
+				if(in[1]=="A")
+					f="Artilleria";
+				else if(in[1]=="C")
+					f="Caballeria";
+				else
+					f="Infanteria";
+				c=(in[2]=="0"?false:true);
+				
+				Tarjeta auxt(in[0],f,c);
+				jt[i]=auxt;
+				vt.push_back(auxt);
 			}
-			if(i==1){ //datos jugador
-				cnt++;
-				Jugador auxj(in[1],in[0],0,cnt);
-				jugadores.push_back(auxj);
-			}
-			else if(i==2){ //cartas jugador
-				std::vector<Tarjeta> jt;
-				for(unsigned int j=0;j<in.size();j++){ //para cada carta agregar a vector
-					sp=splitstring(in[j],'-');
-					std::vector<std::string> tar=splitstring(sp[0],' ');
-					bool canjeada=(sp[1]=="0"?false:true);
-					Tarjeta auxt(tar[1],tar[0],canjeada);
-					jt.push_back(auxt);
-					vt.push_back(auxt);
-				}
-				jugadores[cnt-1].setTarjetas(jt);
-			}
-			else if(i==3){ //territorios jugador
-				for(unsigned int j=0;j<in.size();j++){
-					sp=splitstring(in[j],'-');
-					Territorio* t0=tablero->searchTerritorio(atoi(sp[0].c_str()));
-					t0->setEjercito(atoi(sp[1].c_str()));
-					jugadores[cnt-1].addTerritorio(t0);
-				}
-				i=0;
-			}
-			i++;
+			jugadores[i].setTarjetas(jt);
+			
 		}
 		tablero->setTarjetas(compararTarjetas(vt,tarjetas));
 		estado=0;
