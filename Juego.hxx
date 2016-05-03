@@ -45,7 +45,7 @@ std::string pickColor(std::vector<std::string>& disp) {
 
 	for(unsigned int i=0; i<disp.size(); i++)
 		std::cout<<'\t'<<disp[i]<<std::endl;
-
+//test
 	while(true) {
 		std::cout<<"\nElige tu color: ";
 		getline(std::cin,cor);
