@@ -1,8 +1,6 @@
 #ifndef NODOHUFFMAN_H__
 #define NODOHUFFMAN_H__
 
-using namespace std;
-
 class NodoHuffman{
 	private:
 		char letra;
@@ -23,6 +21,6 @@ class NodoHuffman{
 		void preOrden();
 };
 
-#include "NodoHuffman.hpp"
+#include "NodoHuffman.hxx"
 
 #endif

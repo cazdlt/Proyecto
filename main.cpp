@@ -1,9 +1,4 @@
-#include <iostream>
-#include <map>
-#include <math.h>
-#include "NodoHuffman.h"
 #include "Juego.h"
-
 
 int main() {
 	//----------------VARIABLES-----------------

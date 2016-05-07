@@ -1,6 +1,8 @@
 #ifndef __FIGURA_H__
 #define __FIGURA_H__
 
+#include <iostream>
+
 class Figura{
     protected:
         std::string tipo;

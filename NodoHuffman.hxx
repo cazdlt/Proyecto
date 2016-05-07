@@ -1,7 +1,5 @@
-#ifndef NODOHUFFMAN__HPP__
-#define NODOHUFFMAN__HPP__
-
-using namespace std;
+#ifndef NODOHUFFMAN__HXX__
+#define NODOHUFFMAN__HXX__
 
 NodoHuffman::NodoHuffman(){
 	letra = '?';

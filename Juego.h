@@ -3,6 +3,7 @@
 
 #include "Jugador.h"
 #include "Tablero.h"
+#include "HuffmanCodec.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -10,18 +11,12 @@
 #include <stack>
 #include <iostream>
 #include <string>
-#include <sstream>
-#include <bitset>
-#include <fstream>
 
 class Juego{
 	protected:
 		std::vector<Jugador> jugadores;
 		Tablero *tablero;
 		int estado; //0. jugando -- 1. no iniciado -- 2. finalizado
-        map<char, string> codificacion; /** mapa que muestra cada caracter y su codificacion binaria*/
-        NodoHuffman * raiz; // CAMBIAR A PROTECTED
-	    std::map<char,int> caracteres; /** mapa que muestra cada caracter y su frecuencia*/
 
 	public:
 	    static unsigned int turno;
@@ -48,11 +43,7 @@ class Juego{
 		bool save(std::string input);
 		void textinit(std::ifstream& file);
 		bool llenarJugadores(int cant);
-
-        bool comprimir(std::string input);
-		std::string llenarMapaCaracteres(std::string);
-        NodoHuffman *crearArbol(map<char, int>);
-        void codificar(NodoHuffman *, string);
+        
 
 
 };
@@ -65,7 +56,7 @@ int updateTurno(Juego* j0);
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores);
 bool decode(std::string in);
 std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjeta>& t2);
-
+std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt);
 
 
 #include "Juego.hxx"

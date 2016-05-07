@@ -391,7 +391,8 @@ bool Juego::save(std::string input){
 	}
 
 	if(in.size()>1) {
-		comprimir(in[0]);
+		HuffmanCodec comp;
+		comp.comprimir(in[0]);
 		remove(in[0].c_str());
 	}
 
@@ -459,12 +460,12 @@ bool Juego::inicializar(std::string input) {
 	std::string line;
 	tablero=new Tablero();
 
-
 	if(arch.is_open()){
 		getline(arch,line);
 		if(line=="1"){
+			HuffmanCodec dec;
 			arch.close();
-			decode(input);
+			dec.decode(input);
 			arch.open("temp");
 			textinit(arch);
 			arch.close();
@@ -485,12 +486,11 @@ bool Juego::inicializar(std::string input) {
 void Juego::textinit(std::ifstream& arch){
 
 	unsigned int sz;
-	unsigned int tts=0,tjs=0;
-	std::string line,f;
+	unsigned int tts=0;
+	std::string line;
 	std::vector<std::string> in,sp;
 	Territorio* t0=NULL;
-	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero),jt;
-	bool c;
+	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero);
 
 	getline(arch,line);
 	sz=atoi(line.c_str());
@@ -516,229 +516,42 @@ void Juego::textinit(std::ifstream& arch){
 				jugadores[i].addTerritorio(t0);
 			}
 
-			//tarjetas
-			getline(arch,line);
-			tjs=atoi(line.c_str());
-			jt.resize(tjs);
-			for(unsigned int j=0;j<tjs;j++){
-				getline(arch,line);
-				in=splitstring(line,' ');
-				if(in[1]=="A")
-					f="Artilleria";
-				else if(in[1]=="C")
-					f="Caballeria";
-				else
-					f="Infanteria";
-				c=(in[2]=="0"?false:true);
-
-				Tarjeta auxt(in[0],f,c);
-				jt[i]=auxt;
-				vt.push_back(auxt);
-			}
-			jugadores[i].setTarjetas(jt);
+			//tarjetas			
+			jugadores[i].setTarjetas(initTarjetas(arch,vt));
 
 		}
 		tablero->setTarjetas(compararTarjetas(vt,tarjetas));
 		estado=0;
 }
 
-bool Juego::comprimir(std::string in){
-    ofstream salida(in+".bin", std::ios_base::binary|ios::ate);
-	if (!salida){
-		cout<<"Could not save loaded sequences into "<<in+".bin";
-		return false;
+std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt){
+	
+	std::vector<std::string> in;
+	std::string line,f;
+	unsigned int tjs=0;
+	std::vector<Tarjeta> jt;
+	bool c;
+	
+	getline(arch,line);
+	tjs=atoi(line.c_str());
+	jt.resize(tjs);
+	for(unsigned int j=0;j<tjs;j++){
+		getline(arch,line);
+		in=splitstring(line,' ');
+		if(in[1]=="A")
+			f="Artilleria";
+		else if(in[1]=="C")
+			f="Caballeria";
+		else
+			f="Infanteria";
+		c=(in[2]=="0"?false:true);
+
+		Tarjeta auxt(in[0],f,c);
+		jt[j]=auxt;
+		vt.push_back(auxt);
 	}
-	salida<<"1"<<std::endl;
-    string cadenaCompleta;
-	cadenaCompleta = this->llenarMapaCaracteres(in);
-	this->raiz = crearArbol(caracteres);
-	this->codificar(raiz,"");
-	unsigned long numeroSimbolos = (unsigned long)this->caracteres.size();
-	salida.write(reinterpret_cast<char*>(& numeroSimbolos),sizeof(numeroSimbolos));
-
-	string mensajeBinario="";
-	std::map<char,string>::iterator ot;
-	unsigned long cnt=0;
-
-	for (unsigned int i=0;i<cadenaCompleta.size();i++){
-        ot = this->codificacion.find(cadenaCompleta[i]);
-         if(ot != codificacion.end()){
-                mensajeBinario += ot->second;
-         }
-	}
-
-	std::string data = mensajeBinario;
-    std::stringstream sstream(data);
-    std::string output;
-    while(sstream.good())
-    {
-        std::bitset<8> bits;
-        sstream >> bits;
-        char c = char(bits.to_ulong());
-        output += c;
-    }
-
-	cnt=output.size();
-	salida.write(reinterpret_cast<char*>(&cnt),sizeof(cnt));
-
-	char caracter= ' ';
-	int frecuencia = 0;
-
-	std::map<char,int>::iterator it;
-
-	for (it = caracteres.begin(); it != caracteres.end(); it++){
-        caracter = it->first;
-        frecuencia = it->second;
-        salida.write((char *)&caracter,sizeof(caracter));
-        salida.write((char *)& frecuencia,sizeof(frecuencia));
-	}
-
-	salida.write(output.c_str(),output.size());
-	salida.close();
-	return true;
+	return jt;
 }
 
-/*
-bool Juego::decode(std::string in){
-		//test
-	ifstream test("test1.in",ios::binary);
-	if (!test){
-		cout<<"Could not load file from "<<in;
-		return false;
-	}
-	this->caracteres.clear();
-	unsigned long x,n;
-	char y;
-	int f;
-	test.read((char*)&x,sizeof(x));
-	test.read((char*)&n,sizeof(n));
-	for(unsigned int i=0;i<x;i++){
-		test.read((char *)&y,sizeof(char));
-        test.read((char *)& f,sizeof(int));
-        caracteres.insert (std::pair<char,int>(y,f));
-	}
-
-	while(no haya mas por leer){
-        string camino;
-        test.read((char *)&camino, 8);
-        std::map<char,string>::iterator it;
-        for(it = codificacion.begin(); it != codificacion.end();it++){
-            if(camino == it->second){
-                //escribir it->first;
-                break;
-            }
-        }
-    }
-	char* buff=new char[n];
-	test.read(buff,n);
-	std::cout<<buff;
-	return true;
-}*/
-
-bool decode(std::string in){
-	//test
-	ifstream test(in,std::ios_base::binary);
-	getline(test,in);
-	unsigned long x,n;
-	char y;
-	int f;
-	test.read((char*)&x,sizeof(x));
-	std::cout<<"numchars: "<<x<<std::endl;
-	test.read((char*)&n,sizeof(n));
-	std::cout<<"tam: "<<n<<std::endl;
-	for(unsigned int i=0;i<x;i++){
-		test.read((char *)&y,sizeof(char));
-        test.read((char *)& f,sizeof(int));
-		std::cout<<y<<": "<<f<<std::endl;
-	}
-	unsigned long buff;
-	test.read((char*)&buff,8);
-	std::cout<<buff<<std::endl;
-	std::string huff;
-	std::bitset<8> bits;
-	unsigned long aa;
-	/*istringstream iss(buff);
-	std::cout<<iss.gcount()<<std::endl;
-	while(iss.good()){
-		iss>>aa;
-		std::cout<<aa<<" ";
-	}*/
-	test.close();
-	return true;
-}
-
-bool compare(NodoHuffman *x,  NodoHuffman *y ){
-	if ( x->getFrecuencia() < y->getFrecuencia() )
-		return true;
-	else if ( x->getFrecuencia() > y->getFrecuencia() )
-		return false;
-	return 0;
-}
-std::string Juego::llenarMapaCaracteres(std::string nombreArchivo){
-
-    string cadena;
-    string archivoCompleto = "";
-    ifstream archivo(nombreArchivo);
-
-    if(!archivo.fail()){
-        while(getline(archivo,cadena)){
-            archivoCompleto += cadena;
-            archivoCompleto+='\n';
-        }
-        archivo.close();
-    }
-
-    std::map<char,int>::iterator it;
-    for(unsigned int i =0;i<archivoCompleto.size();i++){
-        it = this->caracteres.find(archivoCompleto[i]);
-        if(it != this->caracteres.end()){
-            this->caracteres[archivoCompleto[i]] = this->caracteres[archivoCompleto[i]]+1;
-        }
-        else{
-            caracteres.insert (std::pair<char,int>(archivoCompleto[i],1));
-        }
-    }
-	std::map<char,int>m=caracteres;
-	/*
-	for(const auto&p:m){
-		std::cout << "m[" << p.first << "] = " << p.second << '\n';
-	}
-	 * */
-
-    return archivoCompleto;
-}
-
-NodoHuffman * Juego::crearArbol(map<char, int> caracteres){
-	NodoHuffman *nodo, *nodo1, *nodo2;
-	list<NodoHuffman *> lista;
-	typename map<char, int>::iterator it;
-	for (it = caracteres.begin(); it != caracteres.end(); it++){
-		nodo = new NodoHuffman();
-		nodo->setLetra(it->first);
-		nodo->setFrecuencia(it->second);
-		lista.push_back(nodo);
-	}
-	while (lista.size()>1){
-		lista.sort(compare);
-		nodo1 = lista.front();
-		lista.pop_front();
-		nodo2 = lista.front();
-		lista.pop_front();
-		nodo = new NodoHuffman();
-		nodo->setIzq(nodo1);
-		nodo->setDer(nodo2);
-		nodo->setFrecuencia(nodo1->getFrecuencia() + nodo2->getFrecuencia());
-		lista.push_back(nodo);
-	}
-	return lista.front();
-}
-void Juego::codificar(NodoHuffman *nodo, string codigo){
-    if (nodo->getLetra() != '?')
-		codificacion[nodo->getLetra()] = codigo;
-	if (nodo->getIzq() != NULL)
-		codificar(nodo->getIzq(), codigo + '0');
-	if (nodo->getDer() != NULL)
-		codificar(nodo->getDer(), codigo + '1');
-}
 
 //EOF
