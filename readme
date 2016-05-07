@@ -1,7 +1,6 @@
 Proyecto EDD 2016-I
 Prof: Rueda Andrea
-AUTHOR: Camilo Andrés Zamora
-
+AUTHOR: Camilo Andrés Zamora - Carlos Reales - Diego García
 
 RISK.
 
@@ -11,5 +10,5 @@ turno ok
 
 ENTREGA 2.
 write ok
-compress TODO
-read ok - readcompress
+compress ok
+read ok text - todo comprimido

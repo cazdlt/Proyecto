@@ -1,15 +1,16 @@
 #include <iostream>
+#include <map>
+#include <math.h>
+#include "NodoHuffman.h"
 #include "Juego.h"
+
 
 int main() {
 	//----------------VARIABLES-----------------
-
 	std::string entrada;
 	Juego juego;
-
 	//----------------COMANDOS------------------
 	std::cout<<"Bienvenido al juego. RISK."<<std::endl;
-
 	do{
 		std::cout<<"$ ";
 		getline(std::cin,entrada);
@@ -64,7 +65,7 @@ int main() {
 		else if(entrada.find("ver")==0){
             if(entrada.size()>4)
                 juego.ver(entrada.substr(4));
-			else 
+			else
 				juego.print();
 		}
 		else if(entrada.find("guardar")==0&&entrada.size()>8){
