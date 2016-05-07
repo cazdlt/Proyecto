@@ -1,6 +1,3 @@
-#ifndef NODOHUFFMAN__HXX__
-#define NODOHUFFMAN__HXX__
-
 NodoHuffman::NodoHuffman(){
 	letra = '?';
 	frecuencia = 0;
@@ -40,5 +37,3 @@ void NodoHuffman::preOrden(){
     if(this->der != NULL)
         this->der->preOrden();
 }
-
-#endif

@@ -21,7 +21,7 @@ public:
 		std::string llenarMapaCaracteres(std::string);
         NodoHuffman *crearArbol(std::map<char, int>);
         void codificar(NodoHuffman *, std::string);
-		bool decode (std::string in);
+		bool decode (std::string in); //TODO
 	
 };
 

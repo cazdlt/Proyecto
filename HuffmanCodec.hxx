@@ -1,10 +1,11 @@
 #include "HuffmanCodec.h"
 
 HuffmanCodec::HuffmanCodec(){
-	//pass
+	raiz=NULL;
 }
 
 HuffmanCodec::HuffmanCodec(std::map<char,int> m){
+	raiz=NULL;
 	caracteres=m;
 }
 
