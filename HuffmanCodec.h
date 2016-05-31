@@ -19,11 +19,14 @@ public:
 		HuffmanCodec(std::map<char,int> m);
 		bool comprimir(std::string input);		
 		std::string llenarMapaCaracteres(std::string);
-        NodoHuffman *crearArbol(std::map<char, int>);
+        NodoHuffman *crearArbol();
         void codificar(NodoHuffman *, std::string);
 		bool decode (std::string in); //TODO
+		void decodificarCaracteres(std::ifstream&,unsigned int x);
 	
 };
+
+std::vector<std::string> splitstring(const std::string &s, char token);
 
 #include "HuffmanCodec.hxx"
 #endif

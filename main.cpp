@@ -6,6 +6,9 @@ int main() {
 	Juego juego;
 	//----------------COMANDOS------------------
 	std::cout<<"Bienvenido al juego. RISK."<<std::endl;
+	juego.inicializar("lul");
+	juego.save("comprimido plswork");
+	juego.inicializar("plswork.bin");
 	do{
 		std::cout<<"$ ";
 		getline(std::cin,entrada);

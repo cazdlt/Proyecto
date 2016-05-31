@@ -47,7 +47,6 @@ class Juego{
 };
 
 //UTILS
-std::vector<std::string> splitstring(const std::string &s, char token);
 std::string pickColor(std::vector<std::string>& disp);
 int updateTurno(Juego* j0);
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores);

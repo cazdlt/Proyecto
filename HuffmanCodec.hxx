@@ -10,18 +10,20 @@ HuffmanCodec::HuffmanCodec(std::map<char,int> m){
 }
 
 bool HuffmanCodec::comprimir(std::string in){
-    std::ofstream salida(in+".bin", std::ios_base::binary|std::ios::ate);
+	
+    std::ofstream salida(in+".bin", std::ios::binary|std::ios::ate);
 	if (!salida){
 		std::cout<<"Could not save loaded sequences into "<<in+".bin";
 		return false;
 	}
+	
 	salida<<"1"<<std::endl;
     std::string cadenaCompleta;
 	cadenaCompleta = this->llenarMapaCaracteres(in);
-	this->raiz = crearArbol(caracteres);
+	this->raiz = crearArbol();
 	this->codificar(raiz,"");
-	unsigned long numeroSimbolos = (unsigned long)this->caracteres.size();
-	salida.write(reinterpret_cast<char*>(& numeroSimbolos),sizeof(numeroSimbolos));
+	unsigned int numeroSimbolos = (unsigned int)this->caracteres.size();
+	salida.write((char*)& numeroSimbolos,sizeof(numeroSimbolos));
 
 	std::string mensajeBinario="";
 	std::map<char,std::string>::iterator ot;
@@ -34,19 +36,10 @@ bool HuffmanCodec::comprimir(std::string in){
          }
 	}
 
-	std::string data = mensajeBinario;
-    std::stringstream sstream(data);
-    std::string output;
-    while(sstream.good())
-    {
-        std::bitset<8> bits;
-        sstream >> bits;
-        char c = char(bits.to_ulong());
-        output += c;
-    }
-
-	cnt=output.size();
-	salida.write(reinterpret_cast<char*>(&cnt),sizeof(cnt));
+	std::cout<<mensajeBinario<<std::endl;
+	cnt=mensajeBinario.size()/8 +1;
+	salida<<cnt;
+	//salida.write(reinterpret_cast<char*>(&cnt),sizeof(cnt));
 
 	char caracter= ' ';
 	int frecuencia = 0;
@@ -56,93 +49,34 @@ bool HuffmanCodec::comprimir(std::string in){
 	for (it = caracteres.begin(); it != caracteres.end(); it++){
         caracter = it->first;
         frecuencia = it->second;
-        salida.write((char *)&caracter,sizeof(caracter));
-        salida.write((char *)& frecuencia,sizeof(frecuencia));
+		salida<<caracter<<" "<<frecuencia<<std::endl;
 	}
-
-	salida.write(output.c_str(),output.size());
+	
+    std::stringstream sstream(mensajeBinario);
+    std::string output;
+    while(sstream.good())
+    {
+        std::bitset<8> bits;
+        sstream >> bits;
+		char n=bits.to_ulong();
+		salida.write((char*)&n,sizeof(n));
+    }
+	
 	salida.close();
 	return true;
 }
 
-/*
-bool Juego::decode(std::string in){
-		//test
-	ifstream test("test1.in",ios::binary);
-	if (!test){
-		cout<<"Could not load file from "<<in;
-		return false;
-	}
-	this->caracteres.clear();
-	unsigned long x,n;
-	char y;
-	int f;
-	test.read((char*)&x,sizeof(x));
-	test.read((char*)&n,sizeof(n));
-	for(unsigned int i=0;i<x;i++){
-		test.read((char *)&y,sizeof(char));
-        test.read((char *)& f,sizeof(int));
-        caracteres.insert (std::pair<char,int>(y,f));
-	}
-
-	while(no haya mas por leer){
-        string camino;
-        test.read((char *)&camino, 8);
-        std::map<char,string>::iterator it;
-        for(it = codificacion.begin(); it != codificacion.end();it++){
-            if(camino == it->second){
-                //escribir it->first;
-                break;
-            }
-        }
+std::vector<std::string> splitstring(const std::string &s, char token) {
+    std::vector<std::string> ret;
+	std::stringstream ss(s);
+    std::string item;
+    while (getline(ss, item, token)) {
+		if(!item.empty())
+			ret.push_back(item);
     }
-	char* buff=new char[n];
-	test.read(buff,n);
-	std::cout<<buff;
-	return true;
-}*/
-
-bool HuffmanCodec::decode(std::string in){
-	//test
-	std::ifstream test(in,std::ios_base::binary);
-	getline(test,in);
-	unsigned long x,n;
-	char y;
-	int f;
-	test.read((char*)&x,sizeof(x));
-	std::cout<<"numchars: "<<x<<std::endl;
-	test.read((char*)&n,sizeof(n));
-	std::cout<<"tam: "<<n<<std::endl;
-	for(unsigned int i=0;i<x;i++){
-		test.read((char *)&y,sizeof(char));
-        test.read((char *)& f,sizeof(int));
-		std::cout<<y<<": "<<f<<std::endl;
-	}
-	unsigned long buff;
-	test.read((char*)&buff,8);
-	std::cout<<buff<<std::endl;
-	/*std::string huff;
-	std::bitset<8> bits;
-	unsigned long aa;
-	istringstream iss(buff);
-	std::cout<<iss.gcount()<<std::endl;
-	while(iss.good()){
-		iss>>aa;
-		std::cout<<aa<<" ";
-	}
-	 * */
-	test.close();
-	return true;
+    return ret;
 }
 
-
-bool compare(NodoHuffman *x,  NodoHuffman *y ){
-	if ( x->getFrecuencia() < y->getFrecuencia() )
-		return true;
-	else if ( x->getFrecuencia() > y->getFrecuencia() )
-		return false;
-	return 0;
-}
 std::string HuffmanCodec::llenarMapaCaracteres(std::string nombreArchivo){
 
     std::string cadena;
@@ -168,16 +102,88 @@ std::string HuffmanCodec::llenarMapaCaracteres(std::string nombreArchivo){
         }
     }
 	std::map<char,int>m=caracteres;
-	/*
+	
 	for(const auto&p:m){
 		std::cout << "m[" << p.first << "] = " << p.second << '\n';
 	}
-	 * */
+	 
 
     return archivoCompleto;
 }
 
-NodoHuffman* HuffmanCodec::crearArbol(std::map<char, int> caracteres){
+void HuffmanCodec::decodificarCaracteres(std::ifstream& arch,unsigned int x){
+	
+	std::string in,aux;
+	std::vector<std::string> datosMapa;
+	
+	for(unsigned int i=0;i<x;i++){
+		
+		getline(arch,in);
+		if(in.empty()){ // si es endline o espacio
+			arch>>aux;
+			arch.ignore();
+			in+=aux;
+		}
+			
+		datosMapa=splitstring(in,' ');
+		
+		if(datosMapa.size()==1){ //si es endline o espacio
+			if(in[0]==' ')
+				caracteres[' ']=atoi(datosMapa[0].c_str());
+			else
+				caracteres['\n']=atoi(datosMapa[0].c_str());
+		}
+		else{ //si es otro caracter
+			caracteres[datosMapa[0][0]]=atoi(datosMapa[1].c_str());
+		}
+	}
+}
+
+bool HuffmanCodec::decode(std::string in){
+	
+	//test
+	std::ifstream arch(in,std::ios::binary);
+	unsigned long numChars,tamanoCadena;
+	char buff;
+	std::string cadenaCompleta="";
+	
+	getline(arch,in); //obviando la linea para identificar tipo de archivo
+		
+	arch.read((char*)&numChars,sizeof(unsigned int)); //no se por que a veces toca con .read o con >> :(
+	arch>>tamanoCadena;	
+	
+	decodificarCaracteres(arch,numChars);	//llena mapa de caracteres	
+	
+	for(unsigned int i=0;i<tamanoCadena;i++){  //llenar cadena codificada en binario
+		arch.read((char*)&buff,sizeof(char)); //lee un char que tiene el valor en bits como unsigned long
+		std::bitset<8> TEST(buff);  //vuelve el ulong a bits
+		cadenaCompleta+=TEST.to_string(); 
+	}
+	
+	////////////////////////PRUEBAS
+	std::cout<<"numchars: "<<numChars<<std::endl;
+	std::cout<<"tam: "<<tamanoCadena<<std::endl;
+	std::map<char,int>m=caracteres;	
+	for(const auto&p:m){
+		std::cout << "m[" << p.first << "] = " << p.second << '\n';
+	}
+	std::cout<<cadenaCompleta<<std::endl;
+	///////////////////////
+	
+	arch.close();
+	return true;
+}
+
+
+bool compare(NodoHuffman *x,  NodoHuffman *y ){
+	if ( x->getFrecuencia() < y->getFrecuencia() )
+		return true;
+	else if ( x->getFrecuencia() > y->getFrecuencia() )
+		return false;
+	return 0;
+}
+
+NodoHuffman* HuffmanCodec::crearArbol(){
 	NodoHuffman *nodo, *nodo1, *nodo2;
 	std::list<NodoHuffman *> lista;
 	typename std::map<char, int>::iterator it;

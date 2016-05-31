@@ -14,6 +14,7 @@ Juego::~Juego() {
 int Juego::getEstado() {
 	return estado;
 }
+
 std::vector<Jugador> Juego::getJugadores() {
 	return jugadores;
 }
@@ -357,16 +358,7 @@ void Juego::print(){
 		std::cout<<"Juego no iniciado.\n"<<std::endl;
 }
 
-std::vector<std::string> splitstring(const std::string &s, char token) {
-    std::vector<std::string> ret;
-	std::stringstream ss(s);
-    std::string item;
-    while (getline(ss, item, token)) {
-		if(!item.empty())
-			ret.push_back(item);
-    }
-    return ret;
-}
+
 
 bool Juego::save(std::string input){
 	std::vector<std::string> in=splitstring(input,' ');
@@ -516,7 +508,7 @@ void Juego::textinit(std::ifstream& arch){
 				jugadores[i].addTerritorio(t0);
 			}
 
-			//tarjetas			
+			//tarjetas
 			jugadores[i].setTarjetas(initTarjetas(arch,vt));
 
 		}
@@ -525,13 +517,13 @@ void Juego::textinit(std::ifstream& arch){
 }
 
 std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt){
-	
+
 	std::vector<std::string> in;
 	std::string line,f;
 	unsigned int tjs=0;
 	std::vector<Tarjeta> jt;
 	bool c;
-	
+
 	getline(arch,line);
 	tjs=atoi(line.c_str());
 	jt.resize(tjs);

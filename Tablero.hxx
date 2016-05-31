@@ -316,7 +316,7 @@ void Tablero::print() {
 
 void Tablero::printDisponibles() {
 	std::vector<Continente*>::iterator it;
-	bool flag;
+	bool flag=false;
 	for(it=continentes.begin(); it!=continentes.end(); it++) {
 		std::cout<<(*it)->getNombre()<<":"<<std::endl;
 		std::vector<Territorio*> te=(*it)->getTerritorios();
