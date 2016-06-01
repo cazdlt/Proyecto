@@ -10,17 +10,18 @@ HuffmanCodec::HuffmanCodec(std::map<char,int> m){
 }
 
 bool HuffmanCodec::comprimir(std::string in){
-	
+
     std::ofstream salida(in+".bin", std::ios::binary|std::ios::ate);
 	if (!salida){
 		std::cout<<"Could not save loaded sequences into "<<in+".bin";
 		return false;
 	}
-	
+
 	salida<<"1"<<std::endl;
     std::string cadenaCompleta;
 	cadenaCompleta = this->llenarMapaCaracteres(in);
 	this->raiz = crearArbol();
+    raiz->preOrden();
 	this->codificar(raiz,"");
 	unsigned int numeroSimbolos = (unsigned int)this->caracteres.size();
 	salida.write((char*)& numeroSimbolos,sizeof(numeroSimbolos));
@@ -28,7 +29,11 @@ bool HuffmanCodec::comprimir(std::string in){
 	std::string mensajeBinario="";
 	std::map<char,std::string>::iterator ot;
 	unsigned long cnt=0;
-
+	
+	for(const auto&p:codificacion){
+		std::cout << "m[" << p.first << "] = " << p.second << '\n';
+	}
+	
 	for (unsigned int i=0;i<cadenaCompleta.size();i++){
         ot = this->codificacion.find(cadenaCompleta[i]);
          if(ot != codificacion.end()){
@@ -51,7 +56,7 @@ bool HuffmanCodec::comprimir(std::string in){
         frecuencia = it->second;
 		salida<<caracter<<" "<<frecuencia<<std::endl;
 	}
-	
+
     std::stringstream sstream(mensajeBinario);
     std::string output;
     while(sstream.good())
@@ -61,7 +66,7 @@ bool HuffmanCodec::comprimir(std::string in){
 		char n=bits.to_ulong();
 		salida.write((char*)&n,sizeof(n));
     }
-	
+
 	salida.close();
 	return true;
 }
@@ -101,32 +106,29 @@ std::string HuffmanCodec::llenarMapaCaracteres(std::string nombreArchivo){
             caracteres.insert (std::pair<char,int>(archivoCompleto[i],1));
         }
     }
-	std::map<char,int>m=caracteres;
+
 	
-	for(const auto&p:m){
-		std::cout << "m[" << p.first << "] = " << p.second << '\n';
-	}
-	 
+
 
     return archivoCompleto;
 }
 
 void HuffmanCodec::decodificarCaracteres(std::ifstream& arch,unsigned int x){
-	
+
 	std::string in,aux;
 	std::vector<std::string> datosMapa;
-	
+
 	for(unsigned int i=0;i<x;i++){
-		
+
 		getline(arch,in);
 		if(in.empty()){ // si es endline o espacio
 			arch>>aux;
 			arch.ignore();
 			in+=aux;
 		}
-			
+
 		datosMapa=splitstring(in,' ');
-		
+
 		if(datosMapa.size()==1){ //si es endline o espacio
 			if(in[0]==' ')
 				caracteres[' ']=atoi(datosMapa[0].c_str());
@@ -140,36 +142,54 @@ void HuffmanCodec::decodificarCaracteres(std::ifstream& arch,unsigned int x){
 }
 
 bool HuffmanCodec::decode(std::string in){
-	
+
 	//test
 	std::ifstream arch(in,std::ios::binary);
 	unsigned long numChars,tamanoCadena;
 	char buff;
 	std::string cadenaCompleta="";
-	
+
 	getline(arch,in); //obviando la linea para identificar tipo de archivo
-		
+
 	arch.read((char*)&numChars,sizeof(unsigned int)); //no se por que a veces toca con .read o con >> :(
-	arch>>tamanoCadena;	
-	
-	decodificarCaracteres(arch,numChars);	//llena mapa de caracteres	
-	
+	arch>>tamanoCadena;
+
+	decodificarCaracteres(arch,numChars);	//llena mapa de caracteres
+
 	for(unsigned int i=0;i<tamanoCadena;i++){  //llenar cadena codificada en binario
 		arch.read((char*)&buff,sizeof(char)); //lee un char que tiene el valor en bits como unsigned long
 		std::bitset<8> TEST(buff);  //vuelve el ulong a bits
-		cadenaCompleta+=TEST.to_string(); 
+		cadenaCompleta+=TEST.to_string();
 	}
-	
+	std::string cadenaNueva = "";
+	this->raiz = this->crearArbol();
+	NodoHuffman * temp = this->raiz;
+    temp->preOrden();
+    
+	for(unsigned int i=0;i<cadenaCompleta.size();i++){		
+        if(temp->isLeaf()){
+            cadenaNueva += temp->getLetra();
+            temp=this->raiz;
+        }
+       
+		if(cadenaCompleta[i]=='0')
+			temp = temp->getIzq();
+		
+		else
+			temp = temp->getDer();
+	}    
+
 	////////////////////////PRUEBAS
 	std::cout<<"numchars: "<<numChars<<std::endl;
 	std::cout<<"tam: "<<tamanoCadena<<std::endl;
-	std::map<char,int>m=caracteres;	
+	std::map<char,int>m=caracteres;
 	for(const auto&p:m){
 		std::cout << "m[" << p.first << "] = " << p.second << '\n';
 	}
 	std::cout<<cadenaCompleta<<std::endl;
+	std::cout<<cadenaNueva<<std::endl;
 	///////////////////////
-	
+
 	arch.close();
 	return true;
 }

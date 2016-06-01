@@ -19,6 +19,7 @@ class NodoHuffman{
 		NodoHuffman *getDer();
 		void setDer(NodoHuffman *);
 		void preOrden();
+		bool isLeaf();
 };
 
 #include "NodoHuffman.hxx"

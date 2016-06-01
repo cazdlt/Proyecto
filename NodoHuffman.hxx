@@ -37,3 +37,9 @@ void NodoHuffman::preOrden(){
     if(this->der != NULL)
         this->der->preOrden();
 }
+bool NodoHuffman::isLeaf(){
+    if(this->getIzq() == NULL && this->getDer() == NULL ){
+      return true;
+    }
+    return false;
+}
