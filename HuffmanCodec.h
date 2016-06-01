@@ -17,11 +17,12 @@ class HuffmanCodec{
 public:
 		HuffmanCodec();
 		HuffmanCodec(std::map<char,int> m);
+		~HuffmanCodec();
 		bool comprimir(std::string input);		
 		std::string llenarMapaCaracteres(std::string);
         NodoHuffman *crearArbol();
         void codificar(NodoHuffman *, std::string);
-		bool decode (std::string in); //TODO
+		bool decode (std::string in); 
 		void decodificarCaracteres(std::ifstream&,unsigned int x);
 	
 };

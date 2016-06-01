@@ -9,6 +9,11 @@ HuffmanCodec::HuffmanCodec(std::map<char,int> m){
 	caracteres=m;
 }
 
+HuffmanCodec::~HuffmanCodec(){
+	if(raiz!=NULL)
+		delete (raiz);
+}
+
 bool HuffmanCodec::comprimir(std::string in){
 
     std::ofstream salida(in+".bin", std::ios::binary|std::ios::ate);
@@ -21,7 +26,6 @@ bool HuffmanCodec::comprimir(std::string in){
     std::string cadenaCompleta;
 	cadenaCompleta = this->llenarMapaCaracteres(in);
 	this->raiz = crearArbol();
-    raiz->preOrden();
 	this->codificar(raiz,"");
 	unsigned int numeroSimbolos = (unsigned int)this->caracteres.size();
 	salida.write((char*)& numeroSimbolos,sizeof(numeroSimbolos));
@@ -30,10 +34,6 @@ bool HuffmanCodec::comprimir(std::string in){
 	std::map<char,std::string>::iterator ot;
 	unsigned long cnt=0;
 	
-	for(const auto&p:codificacion){
-		std::cout << "m[" << p.first << "] = " << p.second << '\n';
-	}
-	
 	for (unsigned int i=0;i<cadenaCompleta.size();i++){
         ot = this->codificacion.find(cadenaCompleta[i]);
          if(ot != codificacion.end()){
@@ -41,7 +41,6 @@ bool HuffmanCodec::comprimir(std::string in){
          }
 	}
 
-	std::cout<<mensajeBinario<<std::endl;
 	cnt=mensajeBinario.size()/8 +1;
 	salida<<cnt;
 	//salida.write(reinterpret_cast<char*>(&cnt),sizeof(cnt));
@@ -107,10 +106,7 @@ std::string HuffmanCodec::llenarMapaCaracteres(std::string nombreArchivo){
         }
     }
 
-	
-
-
-    return archivoCompleto;
+	return archivoCompleto;
 }
 
 void HuffmanCodec::decodificarCaracteres(std::ifstream& arch,unsigned int x){
@@ -145,51 +141,45 @@ bool HuffmanCodec::decode(std::string in){
 
 	//test
 	std::ifstream arch(in,std::ios::binary);
+	std::ofstream temparch("temp");
 	unsigned long numChars,tamanoCadena;
 	char buff;
-	std::string cadenaCompleta="";
-
+	std::string cadenaCompleta="",archivoCompleto="";
+	NodoHuffman* nodo;
+	if(!arch.is_open())
+		return false;
+	
 	getline(arch,in); //obviando la linea para identificar tipo de archivo
 
-	arch.read((char*)&numChars,sizeof(unsigned int)); //no se por que a veces toca con .read o con >> :(
+	arch.read((char*)&numChars,sizeof(unsigned int)); //no se por que a veces toca con .read o con >> 
 	arch>>tamanoCadena;
 
 	decodificarCaracteres(arch,numChars);	//llena mapa de caracteres
 
-	for(unsigned int i=0;i<tamanoCadena;i++){  //llenar cadena codificada en binario
+	for(unsigned int i=0;i<tamanoCadena;i++){
 		arch.read((char*)&buff,sizeof(char)); //lee un char que tiene el valor en bits como unsigned long
 		std::bitset<8> TEST(buff);  //vuelve el ulong a bits
 		cadenaCompleta+=TEST.to_string();
 	}
-	std::string cadenaNueva = "";
-	this->raiz = this->crearArbol();
-	NodoHuffman * temp = this->raiz;
-    temp->preOrden();
+	this->raiz = crearArbol();
+	nodo = this->raiz;
     
 	for(unsigned int i=0;i<cadenaCompleta.size();i++){		
-        if(temp->isLeaf()){
-            cadenaNueva += temp->getLetra();
-            temp=this->raiz;
+        if(nodo->isLeaf()){
+            archivoCompleto += nodo->getLetra();
+            nodo=this->raiz;
         }
-       
-		if(cadenaCompleta[i]=='0')
-			temp = temp->getIzq();
-		
+        if(cadenaCompleta[i]=='0')
+			nodo = nodo->getIzq();		
 		else
-			temp = temp->getDer();
+			nodo = nodo->getDer();
 	}    
 
-	////////////////////////PRUEBAS
-	std::cout<<"numchars: "<<numChars<<std::endl;
-	std::cout<<"tam: "<<tamanoCadena<<std::endl;
-	std::map<char,int>m=caracteres;
-	for(const auto&p:m){
-		std::cout << "m[" << p.first << "] = " << p.second << '\n';
-	}
-	std::cout<<cadenaCompleta<<std::endl;
-	std::cout<<cadenaNueva<<std::endl;
-	///////////////////////
-
+	if(temparch.is_open())
+		temparch<<archivoCompleto;
+	else return false;
+	
+	temparch.close();
 	arch.close();
 	return true;
 }

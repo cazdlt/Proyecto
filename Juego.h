@@ -41,10 +41,7 @@ class Juego{
 		bool save(std::string input);
 		void textinit(std::ifstream& file);
 		bool llenarJugadores(int cant);
-        
-
-
-};
+	};
 
 //UTILS
 std::string pickColor(std::vector<std::string>& disp);

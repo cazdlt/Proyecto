@@ -457,16 +457,20 @@ bool Juego::inicializar(std::string input) {
 		if(line=="1"){
 			HuffmanCodec dec;
 			arch.close();
-			dec.decode(input);
-			arch.open("temp");
-			textinit(arch);
-			arch.close();
-			remove("temp");
+			if(dec.decode(input)){ //si da tiempo hacer que textinit reciba el string no el archivo
+				arch.open("temp");
+				if(arch.is_open()){
+					getline(arch,line);
+					textinit(arch);
+					arch.close();
+				}
+				remove("temp");
+			}
 		}
 		else{
 			textinit(arch);
-		}
-		arch.close();
+			arch.close();
+		}		
 		return true;
 	}
 	else{
@@ -479,7 +483,7 @@ void Juego::textinit(std::ifstream& arch){
 
 	unsigned int sz;
 	unsigned int tts=0;
-	std::string line;
+	std::string line="";
 	std::vector<std::string> in,sp;
 	Territorio* t0=NULL;
 	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero);

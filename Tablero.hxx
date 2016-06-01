@@ -287,6 +287,7 @@ Tablero::Tablero() {
 	Asia->AgregarTerritorio(Yakutsk);
 
 	//AGREGANDO A TABLERO
+	
 	this->continentes.push_back(AmericaN);
 	this->continentes.push_back(Europe);
 	this->continentes.push_back(Asia);

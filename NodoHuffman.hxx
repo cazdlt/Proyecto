@@ -5,6 +5,10 @@ NodoHuffman::NodoHuffman(){
 	der = NULL;
 }
 NodoHuffman::~NodoHuffman(){
+	if(izq!=NULL)
+		delete (izq);
+	if(der!=NULL)
+		delete(der);
 }
 char NodoHuffman::getLetra(){
 	return letra;

@@ -1,17 +1,12 @@
 #include "Juego.h"
 
-
-
-
 int main() {
 	//----------------VARIABLES-----------------
 	std::string entrada;
 	Juego juego;
 	//----------------COMANDOS------------------
 	std::cout<<"Bienvenido al juego. RISK."<<std::endl;
-	juego.inicializar("lmao");
-	juego.save("comprimido plswork");
-	juego.inicializar("plswork.bin");
+
 	do{
 		std::cout<<"$ ";
 		getline(std::cin,entrada);
