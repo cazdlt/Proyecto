@@ -25,9 +25,11 @@ class Tablero{
 		void print();
 		void printDisponibles();     
 		Territorio* searchTerritorio(unsigned int id);
+		Territorio* searchTerritorio(std::string nombre);
 		Territorio* searchTerritorioDisponible(unsigned int id);
         Territorio* pickAdyacente(bool enemigo,Jugador* j0,Territorio* terr);
 		void fillTarjetas();
+		std::vector<Territorio*> getTerritorios();
 };
 
 //UTILS

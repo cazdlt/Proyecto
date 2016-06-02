@@ -556,7 +556,14 @@ void Juego::mejorConquista(){
 
 void Juego::costoConquista(std::string input){
 	//TODO
-	std::cout<<input<<std::endl;
+	std::vector<Territorio*> tts=tablero->getTerritorios();
+	Territorio* src=tablero->searchTerritorio(input);
+	src->rutaAEnemigos(tts);
+	/*
+	cm=encontrarCaminos(src,MST);
+	return cm;	
+	 */
 }
+
 
 //EOF

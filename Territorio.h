@@ -4,8 +4,10 @@
 #include "Jugador.h"
 #include "Figura.h"
 #include <vector>
+#include <algorithm>
 
 class Jugador;
+struct TArista;
 
 class Territorio{
 protected:
@@ -41,6 +43,8 @@ public:
         bool isOcupado();
 		std::string getColor();
 		void setColor(std::string n);
+		int obtenerCostoEjercito(Territorio* des);
+		std::vector<TArista> rutaAEnemigos(std::vector<Territorio*>& grafo);
 		
 		//FUNCIONES
 		bool operator<(const Territorio& cmp);
@@ -49,6 +53,20 @@ public:
 		void print();
 		
 };
+
+struct TArista{
+	unsigned int src;
+	unsigned int des;
+	int dist; //distancia total para dij
+
+	TArista(unsigned int s,unsigned int d,float peso);
+	TArista();
+	friend bool operator> (const TArista& a, const TArista& b);
+	friend std::ostream& operator<<(std::ostream& o,TArista& obj);
+};
+
+int buscarDijsktra(unsigned int index,std::vector<TArista> n);
+Territorio* buscarTerritorioGrafo(std::vector<Territorio*>& tts, int id);
 
 #include "Territorio.hxx"
 #endif

@@ -5,6 +5,8 @@ int main() {
 	std::string entrada;
 	Juego juego;
 	//----------------COMANDOS------------------
+	juego.inicializar("lul");
+	juego.costoConquista("Alaska");
 	std::cout<<"Bienvenido al juego. RISK."<<std::endl;
 
 	do{

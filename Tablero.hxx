@@ -352,6 +352,18 @@ Territorio* Tablero::searchTerritorio(unsigned int id){
 	return NULL;
 }
 
+Territorio* Tablero::searchTerritorio(std::string nombre){
+	std::vector<Territorio*> vt;
+	for(unsigned int i=0;i<continentes.size();i++){
+		vt=continentes[i]->getTerritorios();
+		for(unsigned int j=0;j<vt.size();j++){
+			if(nombre==vt[j]->getNombre())
+				return vt[j];
+		}
+	}
+	return NULL;
+}
+
 Territorio* Tablero::searchTerritorioDisponible(unsigned int id){
 	for(unsigned int i=0;i<continentes.size();i++){
 		std::vector<Territorio*> vt=continentes[i]->getTerritorios();
@@ -485,6 +497,17 @@ void Tablero::fillTarjetas() {
 		auxT.push(*it0);
 
 	tarjetas=auxT;
+}
+
+std::vector<Territorio*> Tablero::getTerritorios(){
+	
+	std::vector<Territorio*> tts;
+	std::vector<Territorio*> ret;
+	for(unsigned int i=0;i<continentes.size();i++){
+		tts=continentes[i]->getTerritorios();
+		ret.insert(ret.end(),tts.begin(),tts.end());
+	}
+	return ret;
 }
 
 //EOF
