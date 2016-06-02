@@ -175,11 +175,13 @@ bool HuffmanCodec::decode(std::string in){
 			nodo = nodo->getDer();
 	}    
 
-	if(temparch.is_open())
+	if(temparch.is_open()){
 		temparch<<archivoCompleto;
+		temparch.close();
+	}
 	else return false;
 	
-	temparch.close();
+	
 	arch.close();
 	return true;
 }
