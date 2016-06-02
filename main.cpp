@@ -67,6 +67,12 @@ int main() {
 		else if(entrada.find("guardar")==0&&entrada.size()>8){
 			juego.save(entrada.substr(8));
 		}
+		else if(entrada=="conquista_mas_barata"){			
+			juego.mejorConquista();
+		}
+		else if(entrada.find("costo_conquista")==0 && entrada.size()>16){
+			juego.costoConquista(entrada.substr(16));
+		}
 		else if(entrada!="salir"&&entrada!="")
             std::cout<<"Comando no encontrado. Digite help para visualizar las opciones disponibles."<<std::endl;
 	}while(entrada!="salir");

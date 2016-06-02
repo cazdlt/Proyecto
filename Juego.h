@@ -41,6 +41,8 @@ class Juego{
 		bool save(std::string input);
 		void textinit(std::ifstream& file);
 		bool llenarJugadores(int cant);
+		void mejorConquista();
+		void costoConquista(std::string input);
 	};
 
 //UTILS

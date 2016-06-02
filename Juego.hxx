@@ -549,5 +549,14 @@ std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt){
 	return jt;
 }
 
+void Juego::mejorConquista(){
+	//TODO
+	std::cout<<"mejor conquista"<<std::endl;
+}
+
+void Juego::costoConquista(std::string input){
+	//TODO
+	std::cout<<input<<std::endl;
+}
 
 //EOF
