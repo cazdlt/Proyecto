@@ -287,6 +287,7 @@ Tablero::Tablero() {
 	Asia->AgregarTerritorio(Yakutsk);
 
 	//AGREGANDO A TABLERO
+	
 	this->continentes.push_back(AmericaN);
 	this->continentes.push_back(Europe);
 	this->continentes.push_back(Asia);
@@ -316,7 +317,7 @@ void Tablero::print() {
 
 void Tablero::printDisponibles() {
 	std::vector<Continente*>::iterator it;
-	bool flag;
+	bool flag=false;
 	for(it=continentes.begin(); it!=continentes.end(); it++) {
 		std::cout<<(*it)->getNombre()<<":"<<std::endl;
 		std::vector<Territorio*> te=(*it)->getTerritorios();

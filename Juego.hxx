@@ -14,6 +14,7 @@ Juego::~Juego() {
 int Juego::getEstado() {
 	return estado;
 }
+
 std::vector<Jugador> Juego::getJugadores() {
 	return jugadores;
 }
@@ -85,17 +86,17 @@ int escogerFiguras(int cantidadJugadores){
 }
 
 bool Juego::llenarJugadores(int cantidadJugadores){
-	
+
 	srand(time(0));
 	std::vector<int> dados;
 	std::string nombreJ,color;
 	int cantidadFiguras;
-	std::vector<std::string> cor= {"Azul","Verde","Amarillo","Rojo","Blanco","Negro"};
-		
+	std::vector<std::string> cor = {"Azul","Verde","Amarillo","Rojo","Blanco","Negro"};
+
 	cantidadFiguras=escogerFiguras(cantidadJugadores);
 	if(!cantidadFiguras)
 		return false;
-		
+
 	for(int i=0; i<cantidadJugadores; i++) {
 		std::cout<<"\nElige un nombre: ";
 		getline(std::cin,nombreJ);
@@ -103,9 +104,9 @@ bool Juego::llenarJugadores(int cantidadJugadores){
 		Jugador auxj(nombreJ, color, cantidadFiguras, i+1);
 		jugadores.push_back(auxj);
 	}
-		
+
 	std::cout<<std::endl;
-	
+
 	for(int i=0; i<cantidadJugadores; i++){
 		int z=rand()%6+1;
 		std::cout<<"Lanzamiento de "<<jugadores[i].getColor()<<": "<<z<<std::endl;
@@ -117,45 +118,45 @@ bool Juego::llenarJugadores(int cantidadJugadores){
 	for(int i=0; i<cantidadJugadores; i++){
 		for(int j=0;j<cantidadJugadores-1;j++){
 			if(dados[j]<dados[j+1]){
-				std::swap(dados[j],dados[j+1]);		
+				std::swap(dados[j],dados[j+1]);
 				std::swap(jugadores[j],jugadores[j+1]);
 			}
 		}
 	}
 	for(int i=0;i<cantidadJugadores;i++)
 		jugadores[i].setID(1+i);
-	
+
 	return true;
 }
 
 bool Juego::inicializar() {
-	
+
 	Territorio::CURR_ID=1;
 	int cantidadJugadores=0;
 	int id,cnt=0,tot=0;
 	std::vector<Continente*> continentes;
 	std::vector<Jugador>::iterator itj;
 	Territorio* t0=NULL;
-	
+
 	std::cout<<"Digite la cantidad de jugadores: ";
 	std::cin>>cantidadJugadores;
 	std::cin.ignore();
-	
+
 	if(!llenarJugadores(cantidadJugadores))
 		return false;
-	
+
 	tablero=new Tablero();
 	tablero->fillTarjetas();
 	continentes=tablero->getContinentes();
 	for(unsigned int i=0;i<continentes.size();i++)
 		tot+=continentes[i]->getTerritorios().size();
-	
+
 	//colonizando
 	while(cnt<tot) {
 		for(itj=jugadores.begin(); itj!=jugadores.end()&&cnt<tot; itj++) {
 			std::cout<<"\nTerritorios disponibles."<<std::endl;
             tablero->printDisponibles();
-			
+
 			while(t0==NULL) {
 				std::cout<<'('<<itj->getColor()<<") Digite el id del territorio a colonizar: ";
 				std::cin>>id;
@@ -175,8 +176,8 @@ bool Juego::inicializar() {
 			cnt++;
 		}
 	}
-	
-	
+
+
 	//llenando y ordenando territorios
 	int canttotal=0;
 
@@ -324,14 +325,14 @@ Tablero* Juego::getTablero() {
 void Juego::ver(std::string input) {
 	//TODO VER CONTINENTE TERRITORIO CARTASDELTURNO STATS
 	Jugador* j0=NULL;
-	
+
 	if(input=="jugadores"){
             std::cout<<"Jugadores en esta partida."<<std::endl;
             printJugadores();
             std::cout<<std::endl;
 			return;
 	}
-		
+
 	if(atoi(input.c_str()))
 		j0=searchJugador(atoi(input.c_str()));
 	else
@@ -357,29 +358,20 @@ void Juego::print(){
 		std::cout<<"Juego no iniciado.\n"<<std::endl;
 }
 
-std::vector<std::string> splitstring(const std::string &s, char token) {
-    std::vector<std::string> ret;
-	std::stringstream ss(s);
-    std::string item;
-    while (getline(ss, item, token)) {
-		if(!item.empty())
-			ret.push_back(item);
-    }
-    return ret;
-}
+
 
 bool Juego::save(std::string input){
 	std::vector<std::string> in=splitstring(input,' ');
-	
+
 	if(in.size()>1){
 		if(in[0]=="comprimido")
 			std::swap(in[0],in[1]);
 		else{
 			std::cout<<"Comando invalido. Digite help para visualizar las opciones disponibles."<<std::endl;
 			return false;
-		}			
+		}
 	}
-	
+
 	std::ofstream arch(in[0]);
 	if(arch.is_open()){
 		guardarPartida(arch,jugadores);
@@ -389,38 +381,40 @@ bool Juego::save(std::string input){
 		std::cout<<"Error de archivo."<<std::endl;
 		return false;
 	}
-	
-	if(in.size()>1) //TODO
-		comprimir(in[0]);
-	
-	
+
+	if(in.size()>1) {
+		HuffmanCodec comp;
+		comp.comprimir(in[0]);
+		remove(in[0].c_str());
+	}
+
 	return true;
 }
 
-bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){ 
+bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){
 	size_t sz=jugadores.size();
 	std::vector<Tarjeta> tjs;
 	std::vector<Territorio*> tts;
-	
+	file<<"0"<<std::endl;
 	file<<sz<<std::endl;
 	for(unsigned int i=0;i<sz;i++){
-		
+
 		//info
 		file<<jugadores[i].getNombre()<<std::endl;
 		file<<jugadores[i].getColor()<<std::endl;
-		
+
 		//territorios
 		tts=jugadores[i].getTerritorios();
 		file<<tts.size()<<std::endl;
 		for(unsigned int j=0;j<tts.size();j++)
 			file<<tts[j]->getID()<<" "<<tts[j]->getEjercito()<<std::endl;
-			
+
 		//tarjetas
 		tjs=jugadores[i].getTarjetas();
 		file<<tjs.size()<<std::endl;
 		for(unsigned int j=0;j<tjs.size();j++)
 			file<<tjs[j].getID()<<std::endl;
-		
+
 	}
 	return true;
 }
@@ -431,7 +425,7 @@ bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){
  * @return  stack mezclado sin las cartas ya en mano
  **/
 std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjeta>& t2){
-	
+
 	std::vector<std::vector<Tarjeta>::iterator> vit;
 	for(std::vector<Tarjeta>::iterator it=t1.begin() ; it!=t1.end() ; it++){
 		Tarjeta::updateVCambio();
@@ -440,31 +434,43 @@ std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjet
 	}
 	for(unsigned int i=0;i<vit.size();i++)
 		t2.erase(vit[i]);
-	
+
 	random_shuffle(t2.begin(),t2.end());
-	
+
 	std::stack<Tarjeta> auxT;
 	for(std::vector<Tarjeta>::iterator it0=t2.begin(); it0!=t2.end(); it0++)
 		auxT.push(*it0);
-		
-		
+
+
 	return auxT;
 }
 
 bool Juego::inicializar(std::string input) {
-	
+
 	Territorio::CURR_ID=1;
 	std::ifstream arch(input);
 	std::string line;
 	tablero=new Tablero();
-	
-	
+
 	if(arch.is_open()){
 		getline(arch,line);
-		if(line.size()==1)
-			textinit(arch,atoi(line.c_str()));
-		//else usar el comprimido
-		arch.close();
+		if(line=="1"){
+			HuffmanCodec dec;
+			arch.close();
+			if(dec.decode(input)){ //si da tiempo hacer que textinit reciba el string no el archivo
+				arch.open("temp");
+				if(arch.is_open()){
+					getline(arch,line);
+					textinit(arch);
+					arch.close();
+				}
+				remove("temp");
+			}
+		}
+		else{
+			textinit(arch);
+			arch.close();
+		}		
 		return true;
 	}
 	else{
@@ -473,18 +479,20 @@ bool Juego::inicializar(std::string input) {
 	}
 }
 
-void Juego::textinit(std::ifstream& arch,unsigned int sz){
-	
-	unsigned int tts=0,tjs=0;
-	std::string line,f;
+void Juego::textinit(std::ifstream& arch){
+
+	unsigned int sz;
+	unsigned int tts=0;
+	std::string line="";
 	std::vector<std::string> in,sp;
 	Territorio* t0=NULL;
-	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero),jt;
+	std::vector<Tarjeta> vt,tarjetas=allTarjetas(tablero);
+
+	getline(arch,line);
+	sz=atoi(line.c_str());
 	jugadores.resize(sz);
-	bool c;
-	
 	for(unsigned int i=0;i<sz;i++)	{
-		
+
 			//datos
 			Jugador auxj;
 			jugadores[i].setID(i+1);
@@ -492,7 +500,7 @@ void Juego::textinit(std::ifstream& arch,unsigned int sz){
 			jugadores[i].setNombre(line);
 			getline(arch,line);
 			jugadores[i].setColor(line);
-			
+
 			//territorios
 			getline(arch,line);
 			tts=atoi(line.c_str());
@@ -503,35 +511,43 @@ void Juego::textinit(std::ifstream& arch,unsigned int sz){
 				t0->setEjercito(atoi(in[1].c_str()));
 				jugadores[i].addTerritorio(t0);
 			}
-			
+
 			//tarjetas
-			getline(arch,line);
-			tjs=atoi(line.c_str());
-			jt.resize(tjs);
-			for(unsigned int j=0;j<tjs;j++){
-				in=splitstring(line,' ');
-				if(in[1]=="A")
-					f="Artilleria";
-				else if(in[1]=="C")
-					f="Caballeria";
-				else
-					f="Infanteria";
-				c=(in[2]=="0"?false:true);
-				
-				Tarjeta auxt(in[0],f,c);
-				jt[i]=auxt;
-				vt.push_back(auxt);
-			}
-			jugadores[i].setTarjetas(jt);
-			
+			jugadores[i].setTarjetas(initTarjetas(arch,vt));
+
 		}
 		tablero->setTarjetas(compararTarjetas(vt,tarjetas));
 		estado=0;
 }
 
-bool comprimir(std::string in){
-	//TODO
-	return true;
+std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt){
+
+	std::vector<std::string> in;
+	std::string line,f;
+	unsigned int tjs=0;
+	std::vector<Tarjeta> jt;
+	bool c;
+
+	getline(arch,line);
+	tjs=atoi(line.c_str());
+	jt.resize(tjs);
+	for(unsigned int j=0;j<tjs;j++){
+		getline(arch,line);
+		in=splitstring(line,' ');
+		if(in[1]=="A")
+			f="Artilleria";
+		else if(in[1]=="C")
+			f="Caballeria";
+		else
+			f="Infanteria";
+		c=(in[2]=="0"?false:true);
+
+		Tarjeta auxt(in[0],f,c);
+		jt[j]=auxt;
+		vt.push_back(auxt);
+	}
+	return jt;
 }
+
 
 //EOF
