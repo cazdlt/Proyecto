@@ -556,14 +556,26 @@ void Juego::mejorConquista(){
 
 void Juego::costoConquista(std::string input){
 	//TODO
-	std::vector<Territorio*> tts=tablero->getTerritorios();
-	Territorio* src=tablero->searchTerritorio(input);
-	src->rutaAEnemigos(tts);
-	/*
-	cm=encontrarCaminos(src,MST);
-	return cm;	
-	 */
+	std::vector<Territorio*> tts; //grafo
+	Territorio* des;
+	Ruta mejorRuta;
+	Jugador* j0;
+	int costoTotal=0;
+	
+	des=tablero->searchTerritorio(input);
+	tts=tablero->getTerritorios();
+	j0=searchJugador(turno);
+	costoTotal=j0->costoConquista(des,tts,mejorRuta);
+	
+	for(unsigned int i=0;i<mejorRuta.size()-1;i++){
+		if(i==0){
+			std::cout<<"Para conquistar el territorio "<<input<<", debe atacar desde "<<tts[mejorRuta[i]-1]->getNombre()<<" pasando por los territorios ";
+		}
+		else{
+			std::cout<<tts[mejorRuta[i]-1]->getNombre() << (i==mejorRuta.size()-2?". ":", ");
+		}
+	}
+	std::cout<<"Debe conquistar "<<costoTotal<<" unidades de ejercito."<<std::endl;
 }
-
 
 //EOF

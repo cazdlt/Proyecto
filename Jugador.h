@@ -57,12 +57,15 @@ class Jugador{
         void fortificar(Tablero* tablero);
         void eliminarTerritorio(std::string nombret);
         void addTerritorio(Territorio* t0);
+		int costoConquista(Territorio* des,std::vector<Territorio*>& tts,Ruta& ret);
 };
 
 //UTILS
 void lanzarDados(int& eo,int& ed);
 int escojerNumDados(int max,bool flag);
 bool realizarAtaque(Territorio* to,Territorio* td);
+std::vector<TArista> encontrarRuta(unsigned int src,unsigned int des,std::vector<TArista>& MST);
+TArista anterior(std::vector<TArista>& MST,unsigned int& src);
 
 #include "Jugador.hxx"
 #endif

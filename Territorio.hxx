@@ -170,7 +170,7 @@ Territorio* buscarTerritorioGrafo(std::vector<Territorio*>& tts, unsigned int id
 	return NULL;
 }
 
-std::vector<TArista> Territorio::rutaAEnemigos(std::vector<Territorio*>& tts){
+std::vector<TArista> Territorio::rutaATodos(std::vector<Territorio*>& tts){ //si da tiempo hacer que solo vaya hasta  un nodo destino
 	
 	TArista aux;
 	std::vector<TArista> nodos,MST;
@@ -198,6 +198,7 @@ std::vector<TArista> Territorio::rutaAEnemigos(std::vector<Territorio*>& tts){
 		
 		if(aux.des!=src)
 			MST.push_back(aux);
+			
 		curr=buscarTerritorioGrafo(tts,aux.des);
 		ady=curr->getTerritoriosA();
 		for(unsigned int j=0;j<ady.size();j++){
@@ -212,9 +213,7 @@ std::vector<TArista> Territorio::rutaAEnemigos(std::vector<Territorio*>& tts){
 			}
 		}
 	}
-	
-	for(unsigned int i=0;i<MST.size();i++)
-		std::cout<<MST[i]<<" "<<std::endl;
+		
 	return MST;
 }
 //EOF

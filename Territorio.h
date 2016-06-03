@@ -8,6 +8,7 @@
 
 class Jugador;
 struct TArista;
+typedef std::vector<unsigned int> Ruta;
 
 class Territorio{
 protected:
@@ -44,7 +45,7 @@ public:
 		std::string getColor();
 		void setColor(std::string n);
 		int obtenerCostoEjercito(Territorio* des);
-		std::vector<TArista> rutaAEnemigos(std::vector<Territorio*>& grafo);
+		std::vector<TArista> rutaATodos(std::vector<Territorio*>& grafo);
 		
 		//FUNCIONES
 		bool operator<(const Territorio& cmp);

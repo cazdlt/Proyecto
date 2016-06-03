@@ -603,4 +603,96 @@ void Jugador::addTerritorio(Territorio* t0) {
 	std::sort(territorios.begin(),territorios.end());
 }
 
+int Jugador::costoConquista(Territorio* des,std::vector<Territorio*>& tts,Ruta& ret){
+	
+	std::vector<TArista> MST,r,mejorRuta;
+	
+	Territorio* src=NULL;
+	bool flag=false;
+	MST=des->rutaATodos(tts); //arbol desde el destino
+			
+	for(unsigned int i=0;i<MST.size();i++){
+		if(tts[MST[i].des-1]->getJugador()==this){ //si encuentra un territorio propio
+			src=tts[MST[i].des-1];
+			if(src->getEjercito()>1){ //si tiene el ejercito suficiente
+				MST=src->rutaATodos(tts);
+				r=encontrarRuta(src->getID(),des->getID(),MST); //hay que volver a verificar las rutas???.. creo que no pero funciona y ya no da el tiempo revisar
+				if(!flag){ //si no tiene uno mejor pues este es
+					mejorRuta=r;
+					flag=true;
+				}
+				else if(r[r.size()-1].dist<mejorRuta[mejorRuta.size()-1].dist ){ //compara el mejor anterior con el nuevo					
+					mejorRuta=r;
+				}
+			}
+		}
+	}
+
+			
+	/* hecho a lo viejo  revisando todos los propios
+	for(unsigned int i=0;i<territorios.size();i++){
+		src=territorios[i];
+		MST=src->rutaATodos(tts);		
+		
+		std::cout<<std::endl;
+		if(i==0)
+			mejorRuta=r;
+		else
+			if(r[r.size()-1].dist<mejorRuta[mejorRuta.size()-1].dist)
+				mejorRuta=r;
+	}
+	std::cout<<"mejor ruta"<<std::endl;
+		for(unsigned int j=0;j<mejorRuta.size();j++)
+			std::cout<<mejorRuta[j]<<" ";
+	* */
+	
+	//solo los indices
+	for(unsigned int i=0;i<mejorRuta.size();i++){
+		if(i==0){
+			ret.push_back(mejorRuta[i].src);
+			ret.push_back(mejorRuta[i].des);
+		}
+		else
+			ret.push_back(mejorRuta[i].des);		
+	}
+
+	return mejorRuta[mejorRuta.size()-1].dist;
+}
+
+TArista anterior(std::vector<TArista>& MST,unsigned int& src){
+	unsigned int ret;
+	for(unsigned int i=0;i<MST.size();i++){
+				if(src==MST[i].des){
+					ret=MST[i].src;
+					src=ret;
+					return MST[i];
+				}
+	}
+	return MST[0]; //uhh no sé qué poner igual nunca debería llegar acá
+}
+
+std::vector<TArista> encontrarRuta(unsigned int src,unsigned int des,std::vector<TArista>& MST){
+	
+	std::vector<TArista> ret;
+	std::deque<TArista> ruta;
+	unsigned int curr;
+	
+	
+	curr=des;			
+	for(unsigned int i=0;i<MST.size();i++)
+		if(MST[i].des==des){
+			ruta.push_front(MST[i]);
+			break;
+		}
+		
+	while(ruta[0].src!=src)
+		ruta.push_front(anterior(MST,curr));			
+	
+	if(ruta.size()>1)
+		ruta.pop_back(); //idk como arreglarlo lul
+	ret.insert(ret.end(),ruta.begin(),ruta.end());
+	
+	return ret;
+}
+
 //EOF

@@ -46,14 +46,12 @@ class Juego{
 	};
 
 //UTILS
-
 std::string pickColor(std::vector<std::string>& disp);
 int updateTurno(Juego* j0);
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores);
 bool decode(std::string in);
 std::stack<Tarjeta> compararTarjetas(std::vector<Tarjeta>& t1,std::vector<Tarjeta>& t2);
 std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt);
-
 
 #include "Juego.hxx"
 #endif
