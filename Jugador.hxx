@@ -615,15 +615,14 @@ int Jugador::costoConquista(Territorio* des,std::vector<Territorio*>& tts,Ruta& 
 		if(tts[MST[i].des-1]->getJugador()==this){ //si encuentra un territorio propio
 			src=tts[MST[i].des-1];
 			if(src->getEjercito()>1){ //si tiene el ejercito suficiente
-				MST=src->rutaATodos(tts);
-				r=encontrarRuta(src->getID(),des->getID(),MST); //hay que volver a verificar las rutas???.. creo que no pero funciona y ya no da el tiempo revisar
+				MST=src->rutaATodos(tts); //hay que volver a verificar las rutas???.. creo que no pero funciona y ya no da el tiempo revisar
+				r=encontrarRuta(src->getID(),des->getID(),MST); 
 				if(!flag){ //si no tiene uno mejor pues este es
 					mejorRuta=r;
 					flag=true;
 				}
-				else if(r[r.size()-1].dist<mejorRuta[mejorRuta.size()-1].dist ){ //compara el mejor anterior con el nuevo					
-					mejorRuta=r;
-				}
+				else if(r[r.size()-1].dist<mejorRuta[mejorRuta.size()-1].dist ) //compara el mejor anterior con el nuevo					
+					mejorRuta=r;				
 			}
 		}
 	}
@@ -647,28 +646,27 @@ int Jugador::costoConquista(Territorio* des,std::vector<Territorio*>& tts,Ruta& 
 	* */
 	
 	//solo los indices
+	ret.reserve(mejorRuta.size()+1);
 	for(unsigned int i=0;i<mejorRuta.size();i++){
-		if(i==0){
+		if(i==0)
 			ret.push_back(mejorRuta[i].src);
-			ret.push_back(mejorRuta[i].des);
-		}
-		else
-			ret.push_back(mejorRuta[i].des);		
+		ret.push_back(mejorRuta[i].des);		
 	}
 
 	return mejorRuta[mejorRuta.size()-1].dist;
 }
 
 TArista anterior(std::vector<TArista>& MST,unsigned int& src){
-	unsigned int ret;
+	
+	TArista aux;
 	for(unsigned int i=0;i<MST.size();i++){
 				if(src==MST[i].des){
-					ret=MST[i].src;
-					src=ret;
-					return MST[i];
+					src=MST[i].src;
+					aux= MST[i];
+					break;
 				}
 	}
-	return MST[0]; //uhh no sé qué poner igual nunca debería llegar acá
+	return aux;
 }
 
 std::vector<TArista> encontrarRuta(unsigned int src,unsigned int des,std::vector<TArista>& MST){
@@ -676,7 +674,6 @@ std::vector<TArista> encontrarRuta(unsigned int src,unsigned int des,std::vector
 	std::vector<TArista> ret;
 	std::deque<TArista> ruta;
 	unsigned int curr;
-	
 	
 	curr=des;			
 	for(unsigned int i=0;i<MST.size();i++)
@@ -690,9 +687,28 @@ std::vector<TArista> encontrarRuta(unsigned int src,unsigned int des,std::vector
 	
 	if(ruta.size()>1)
 		ruta.pop_back(); //idk como arreglarlo lul
+		
 	ret.insert(ret.end(),ruta.begin(),ruta.end());
 	
 	return ret;
+}
+
+Territorio* Jugador::mejorConquista(std::vector<Territorio*>& tts){
+	Territorio* menor;
+	int menorEjercito=99999999;
+	std::vector<Territorio*> ady;
+	for(unsigned int i=0;i<territorios.size();i++){
+		ady=territorios[i]->getTerritoriosA();
+		for(unsigned int j=0;j<ady.size();j++){
+			if(ady[j]->getJugador()==this){				
+				if(ady[j]->getEjercito()<(int)menorEjercito){
+					menorEjercito=ady[j]->getEjercito();
+					menor=ady[i];
+				}						
+			}
+		}
+	}
+	return menor;
 }
 
 //EOF

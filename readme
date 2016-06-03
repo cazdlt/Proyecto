@@ -14,5 +14,14 @@ compress ok
 read ok
 
 ENTREGA 3.
-costoconquista<> TODO
+costoconquista<> ok
 mejorconquista   TODO
+
+/*
+TODO
+
+completar help
+verificar comodines
+mejorconquista
+turno desde archivo
+*/

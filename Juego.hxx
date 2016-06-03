@@ -383,13 +383,21 @@ bool Juego::save(std::string input){
 	}
 
 	if(in.size()>1) {
-		HuffmanCodec comp;
+		HuffmanCodec comp;		
 		comp.comprimir(in[0]);
+		
+		char auxname[200];
+		in[0].copy(auxname,in[0].size());
+		auxname[in[0].size()]='\0';
+		strcat(auxname,".bin");
 		remove(in[0].c_str());
+		std::rename(auxname,in[0].c_str());
 	}
 
 	return true;
 }
+
+
 
 bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){
 	size_t sz=jugadores.size();
@@ -397,6 +405,7 @@ bool guardarPartida(std::ofstream& file,std::vector<Jugador> jugadores){
 	std::vector<Territorio*> tts;
 	file<<"0"<<std::endl;
 	file<<sz<<std::endl;
+	file<<Juego::turno<<std::endl;
 	for(unsigned int i=0;i<sz;i++){
 
 		//info
@@ -490,6 +499,8 @@ void Juego::textinit(std::ifstream& arch){
 
 	getline(arch,line);
 	sz=atoi(line.c_str());
+	getline(arch,line);
+	turno=atoi(line.c_str());
 	jugadores.resize(sz);
 	for(unsigned int i=0;i<sz;i++)	{
 
@@ -551,11 +562,35 @@ std::vector<Tarjeta> initTarjetas(std::ifstream& arch,std::vector<Tarjeta>& vt){
 
 void Juego::mejorConquista(){
 	//TODO
-	std::cout<<"mejor conquista"<<std::endl;
+	std::vector<Territorio*> tts; //grafo
+	Jugador* j0;
+	Territorio* mejor;
+	Ruta mejorRuta;
+	int costoTotal=0;
+	
+	j0=searchJugador(turno);
+	tts=tablero->getTerritorios();
+	mejor=j0->mejorConquista(tts);
+	
+	costoTotal=j0->costoConquista(mejor,tts,mejorRuta);
+	
+	for(unsigned int i=0;i<mejorRuta.size()-1;i++){
+		if(i==0){
+			std::cout<<"La conquista mas barata es avanzar sobre el territorio "<<mejor->getNombre()<<" desde el territorio "<<tts[mejorRuta[i]-1]->getNombre();
+			if(mejorRuta.size()>2)
+				std::cout<<" pasando por los territorios ";
+			else
+				std::cout<<". ";
+		}
+		else{
+			std::cout<<tts[mejorRuta[i]-1]->getNombre() << (i==mejorRuta.size()-2?". ":", ");
+		}
+	}
+	std::cout<<"Debe conquistar "<<costoTotal<<" unidades de ejercito."<<std::endl;
 }
 
 void Juego::costoConquista(std::string input){
-	//TODO
+	
 	std::vector<Territorio*> tts; //grafo
 	Territorio* des;
 	Ruta mejorRuta;

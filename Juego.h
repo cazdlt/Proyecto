@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <stack>
+#include <string.h>
 
 class Juego{
 	protected:

@@ -58,6 +58,7 @@ class Jugador{
         void eliminarTerritorio(std::string nombret);
         void addTerritorio(Territorio* t0);
 		int costoConquista(Territorio* des,std::vector<Territorio*>& tts,Ruta& ret);
+		Territorio* mejorConquista(std::vector<Territorio*>& tts);
 };
 
 //UTILS
